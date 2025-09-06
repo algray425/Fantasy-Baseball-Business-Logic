@@ -1,8 +1,10 @@
 Code
     - Add null checks EVERYWHERE!
     - Add custom exceptions
+       - What to return when exceptions are thrown? empty model, exception messaging, both?
     - Add metrics
     - Add unit tests
+    - cleanup import statements (ie everywhere with *)
 
 Features
     - Player bio updates
