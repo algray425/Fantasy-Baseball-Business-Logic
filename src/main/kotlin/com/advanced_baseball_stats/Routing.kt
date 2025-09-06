@@ -1,5 +1,6 @@
 package com.advanced_baseball_stats
 
+import com.advanced_baseball_stats.exception.UnknownBattingStatException
 import com.advanced_baseball_stats.handler.batting.BattingStatHandler
 import com.advanced_baseball_stats.handler.game.GameStatHandler
 import com.advanced_baseball_stats.handler.grade.GradeHandler
@@ -7,6 +8,7 @@ import com.advanced_baseball_stats.handler.math.MathStatHandler
 import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
 import com.advanced_baseball_stats.handler.player.PlayerStatHandler
 import com.advanced_baseball_stats.handler.schedule.ScheduleHandler
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -43,7 +45,16 @@ fun Application.configureRouting() {
 
             val statList = stats.split(",")
 
-            call.respond(BattingStatHandler.getBattingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList))
+            try
+            {
+                val playerStats = BattingStatHandler.getBattingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList)
+
+                call.respond(playerStats)
+            }
+            catch (ex: UnknownBattingStatException)
+            {
+                call.respond(HttpStatusCode.InternalServerError, ex.message ?: "invalid input")
+            }
         }
 
         get("/v2/stat/pitching/{id}/{period}/{startDate}")
