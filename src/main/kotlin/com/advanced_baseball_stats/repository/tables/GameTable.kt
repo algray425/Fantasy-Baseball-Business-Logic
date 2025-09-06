@@ -1,0 +1,53 @@
+package com.advanced_baseball_stats.repository.tables
+
+import org.ktorm.schema.Table
+import org.ktorm.schema.boolean
+import org.ktorm.schema.int
+import org.ktorm.schema.varchar
+
+object GameTable : Table<Nothing>("games")
+{
+    val gid         = varchar   ("gid"          )
+    val visteam     = varchar   ("visteam"      )
+    val hometeam    = varchar   ("hometeam"     )
+    val site        = varchar   ("site"         )
+    val date        = varchar   ("date"         )
+    val number      = int       ("number"       )
+    val starttime   = int       ("starttime"    )
+    val daynight    = varchar   ("daynight"     )
+    val innings     = int       ("innings"      )
+    val tiebreaker  = int       ("tiebreaker"   )
+    val usedh       = boolean   ("usedh"        )
+    val htbf        = varchar   ("htbf"         )
+    val timeofgame  = int       ("timeofgame"   )
+    val attendance  = int       ("attendance"   )
+    val fieldcond    = varchar  ("fieldcond"    )
+    val precip      = varchar   ("precip"       )
+    val sky         = varchar   ("sky"          )
+    val temp        = int       ("temp"         )
+    val winddir     = varchar   ("winddir"      )
+    val windspeed   = int       ("windspeed"    )
+    val oscorer     = varchar   ("oscorer"      )
+    val forfeit     = varchar   ("forfeit"      )
+    val suspend     = varchar   ("suspend"      )
+    val umphome     = varchar   ("umphome"      )
+    val ump1b       = varchar   ("ump1b"        )
+    val ump2b       = varchar   ("ump2b"        )
+    val ump3b       = varchar   ("ump3b"        )
+    val umplf       = varchar   ("umplf"        )
+    val umprf       = varchar   ("umprf"        )
+    val wp          = varchar   ("wp"           )
+    val lp          = varchar   ("lp"           )
+    val save        = varchar   ("save"         )
+    val gametype    = varchar   ("gametype"     )
+    val vruns       = int       ("vruns"        )
+    val hruns       = int       ("hruns"        )
+    val wteam       = varchar   ("wteam"        )
+    val lteam       = varchar   ("lteam"        )
+    val line        = varchar   ("line"         )
+    val batteries   = varchar   ("batteries"    )
+    val lineups     = varchar   ("lineups"      )
+    val box         = varchar   ("box"          )
+    val pbp         = varchar   ("pbp"          )
+    val season      = int       ("season"       )
+}

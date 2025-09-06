@@ -1,0 +1,15 @@
+Code
+    - Add null checks EVERYWHERE!
+    - Add custom exceptions
+    - Add metrics
+    - Add unit tests
+
+Features
+    - Player bio updates
+        - Position
+        - Team
+    - Caching
+    - Consistency rankings
+    - Lineup optimizer
+        - Player predictions
+

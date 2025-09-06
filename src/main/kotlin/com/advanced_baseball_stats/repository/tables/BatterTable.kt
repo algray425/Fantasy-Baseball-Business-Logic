@@ -1,0 +1,48 @@
+package com.advanced_baseball_stats.repository.tables
+
+import org.ktorm.schema.Table
+import org.ktorm.schema.int
+import org.ktorm.schema.varchar
+
+object BatterTable : Table<Nothing>("batters")
+{
+    val gid = varchar("gid")
+    val id = varchar("id")
+    val team = varchar("team")
+    val b_lp = int("b_lp")
+    val b_seq = int("b_seq")
+    val stattype = varchar("stattype")
+    val b_pa = int("b_pa")
+    val b_ab = int("b_ab")
+    val b_r = int("b_r")
+    val b_h = int("b_h")
+    val b_d = int("b_d")
+    val b_t = int("b_t")
+    val b_hr = int("b_hr")
+    val b_rbi = int("b_rbi")
+    val b_sh = int("b_sh")
+    val b_sf = int("b_sf")
+    val b_hbp = int("b_hbp")
+    val b_w = int("b_w")
+    val b_iw = int("b_iw")
+    val b_k = int("b_k")
+    val b_sb = int("b_sb")
+    val b_cs = int("b_cs")
+    val b_gdp = int("b_gdp")
+    val b_xi = int("b_xi")
+    val b_roe = int("b_roe")
+    val dh = int("dh")
+    val ph = int("ph")
+    val pr = int("pr")
+    val date = varchar("date")
+    val number = int("number")
+    val site = varchar("site")
+    val vishome = varchar("vishome")
+    val opp = varchar("opp")
+    val win = int("win")
+    val loss = int("loss")
+    val tie = int("tie")
+    val gametype = varchar("gametype")
+    val box = varchar("box")
+    val pbp = varchar("pbp")
+}

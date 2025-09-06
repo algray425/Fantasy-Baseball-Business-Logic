@@ -1,0 +1,164 @@
+package com.advanced_baseball_stats
+
+import com.advanced_baseball_stats.handler.batting.BattingStatHandler
+import com.advanced_baseball_stats.handler.game.GameStatHandler
+import com.advanced_baseball_stats.handler.grade.GradeHandler
+import com.advanced_baseball_stats.handler.math.MathStatHandler
+import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
+import com.advanced_baseball_stats.handler.player.PlayerStatHandler
+import com.advanced_baseball_stats.handler.schedule.ScheduleHandler
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+
+fun Application.configureRouting() {
+    routing {
+        get("/")
+        {
+            call.respond("Hello World!")
+        }
+
+        get("/schedule/{team}/{startDate}/{endDate}")
+        {
+            val team        = call.parameters["team"        ].toString()
+            val startDate   = call.parameters["startDate"   ].toString()
+            val endDate     = call.parameters["endDate"     ].toString()
+
+            call.respond(ScheduleHandler.getUpcomingSchedule(team, startDate, endDate))
+        }
+
+        get("/v2/stat/batting/{id}/{period}/{startDate}")
+        {
+            val id          = call.parameters["id"          ].toString()
+            val period      = call.parameters["period"      ].toString()
+            val startDate   = call.parameters["startDate"   ].toString()
+
+            val queryParameters = call.queryParameters
+
+            val endDate             = queryParameters["endDate"             ] ?: ""
+            val pitcherId           = queryParameters["pitcherId"           ] ?: ""
+            val pitcherHandedness   = queryParameters["pitcherHandedness"   ] ?: ""
+            val stats               = queryParameters["stats"               ] ?: ""
+
+            val statList = stats.split(",")
+
+            call.respond(BattingStatHandler.getBattingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList))
+        }
+
+        get("/v2/stat/pitching/{id}/{period}/{startDate}")
+        {
+            val id          = call.parameters["id"          ].toString()
+            val period      = call.parameters["period"      ].toString()
+            val startDate   = call.parameters["startDate"   ].toString()
+
+            val queryParameters = call.queryParameters
+
+            val endDate             = queryParameters["endDate"             ] ?: ""
+            val pitcherId           = queryParameters["batterId"            ] ?: ""
+            val pitcherHandedness   = queryParameters["batterSide"          ] ?: ""
+            val stats               = queryParameters["stats"               ] ?: ""
+
+            val statList = stats.split(",")
+
+            call.respond(PitchingStatHandler.getPitchingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList))
+        }
+
+        get("/players/{name}")
+        {
+            val name: String = call.parameters["name"].toString()
+
+            val uri = call.request.uri
+
+            println(uri)
+
+            call.respond(PlayerStatHandler.getPlayersByName(name, uri))
+        }
+
+        get("/player/{id}")
+        {
+            val id: String = call.parameters["id"].toString()
+
+            val uri = call.request.uri
+
+            println(uri)
+
+            call.respond(PlayerStatHandler.getPlayerFromId(id, uri));
+        }
+
+        get("/games/{team}/{startDate}")
+        {
+            val team        = call.parameters["team"        ].toString()
+            val startDate   = call.parameters["startDate"   ].toString()
+
+            call.respond(GameStatHandler.getGames(team, startDate))
+        }
+
+        get("/grades/batting/{id}/{period}/{startWeekNumber}")
+        {
+            val id                  = call.parameters["id"                  ].toString()
+            val period              = call.parameters["period"              ].toString()
+            val startWeekNumber     = call.parameters["startWeekNumber"     ].toString()
+
+            val queryParameters = call.queryParameters
+
+            val endWeekNumber   = queryParameters["endWeekNumber"       ] ?: ""
+            val stat            = queryParameters["stat"                ] ?: ""
+
+            val stats = stat.split(",")
+
+            call.respond(GradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, stats))
+        }
+
+        get("/grades/batting/{stat}/{period}/{percentileStart}/{weekNumber}/{season}")
+        {
+            val stat            = call.parameters["stat"                ].toString()
+            val period          = call.parameters["period"              ].toString()
+            val percentileStart = call.parameters["percentileStart"     ].toString()
+            val weekNumber      = call.parameters["weekNumber"          ].toString()
+            val season          = call.parameters["season"              ].toString()
+
+            val queryParameters = call.queryParameters
+
+            val showAvailable = queryParameters["showAvailable"] ?: "false"
+
+            call.respond(GradeHandler.getBattingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable))
+        }
+
+        get("/grades/pitching/{stat}/{period}/{percentileStart}/{weekNumber}/{season}")
+        {
+            val stat            = call.parameters["stat"                ].toString()
+            val period          = call.parameters["period"              ].toString()
+            val percentileStart = call.parameters["percentileStart"     ].toString()
+            val weekNumber      = call.parameters["weekNumber"          ].toString()
+            val season          = call.parameters["season"              ].toString()
+
+            val queryParameters = call.queryParameters
+
+            val showAvailable = queryParameters["showAvailable"] ?: "false"
+
+            call.respond(GradeHandler.getPitchingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable))
+        }
+
+
+        get("/stat/batting/linearRegression/{id}/{xStat}/{yStat}/{startDate}")
+        {
+            val id          = call.parameters["id"          ].toString()
+            val xStat       = call.parameters["xStat"       ].toString()
+            val yStat       = call.parameters["yStat"       ].toString()
+            val startDate   = call.parameters["startDate"   ].toString()
+
+            call.respond(MathStatHandler.getLinearRegression(id, xStat, yStat, startDate))
+        }
+
+        get("/stat/batting/mean/{id}/{xStat}/{yStat}/{startDate}")
+        {
+            val id          = call.parameters["id"          ].toString()
+            val xStat       = call.parameters["xStat"       ].toString()
+            val yStat       = call.parameters["yStat"       ].toString()
+            val startDate   = call.parameters["startDate"   ].toString()
+
+            call.respond(MathStatHandler.getMeanValues(id, xStat, yStat, startDate))
+        }
+    }
+}
