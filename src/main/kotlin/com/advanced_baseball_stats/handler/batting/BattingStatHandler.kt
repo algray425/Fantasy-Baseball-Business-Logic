@@ -3,6 +3,7 @@ package com.advanced_baseball_stats.handler.batting
 import com.advanced_baseball_stats.exception.UnknownBattingStatException
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.common.Period
+import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
 object BattingStatHandler
 {
@@ -28,7 +29,7 @@ object BattingStatHandler
             }
         }
 
-        val convertedPeriod = Period.valueOf(period)
+        val convertedPeriod = PeriodConverter.convertPeriod(period)
 
         if (Period.PER_GAME.equals(convertedPeriod))
         {

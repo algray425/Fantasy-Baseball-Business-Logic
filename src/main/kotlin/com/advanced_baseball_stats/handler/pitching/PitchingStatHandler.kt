@@ -2,6 +2,7 @@ package com.advanced_baseball_stats.handler.pitching
 
 import com.advanced_baseball_stats.model.common.Period
 import com.advanced_baseball_stats.model.pitching.PitchingStat
+import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
 object PitchingStatHandler
 {
@@ -17,7 +18,7 @@ object PitchingStatHandler
             pitchingStatList.add(PitchingStat.valueOf(stat))
         }
 
-        val convertedPeriod = Period.valueOf(period)
+        val convertedPeriod = PeriodConverter.convertPeriod(period)
 
         if (Period.AGGREGATE.equals(convertedPeriod))
         {

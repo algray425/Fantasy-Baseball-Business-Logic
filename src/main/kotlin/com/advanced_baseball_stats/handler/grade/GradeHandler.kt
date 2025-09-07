@@ -5,6 +5,7 @@ import com.advanced_baseball_stats.model.grades.HolisticBattingGrade
 import com.advanced_baseball_stats.model.common.Period
 import com.advanced_baseball_stats.model.grades.HolisticGrade
 import com.advanced_baseball_stats.model.grades.PitchingGradeStat
+import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
 object GradeHandler
 {
@@ -19,7 +20,7 @@ object GradeHandler
 
     fun getGradesByPlayer(id: String, period: String, startWeekNumber: String, endWeekNumber: String, stats: List<String>): MutableList<HolisticBattingGrade>
     {
-        val convertedPeriod = Period.valueOf(period .uppercase())
+        val convertedPeriod = PeriodConverter.convertPeriod(period)
 
         val convertedStartWeekNumber = startWeekNumber.toInt()
 
@@ -58,8 +59,8 @@ object GradeHandler
 
     fun getBattingGradesByPercentile(stat: String, period: String, percentileStart: String, weekNumber: String, season: String, showAvailable: String): MutableList<HolisticGrade>
     {
-        val battingStat     = BattingStat   .valueOf(stat   .uppercase())
-        val convertedPeriod = Period        .valueOf(period .uppercase())
+        val battingStat     = BattingStat.valueOf(stat.uppercase())
+        val convertedPeriod = PeriodConverter.convertPeriod(period)
 
         val convertedPercentileStart    = percentileStart   .toFloat    ()
         val convertedWeekNumber         = weekNumber        .toInt      ()
@@ -73,8 +74,8 @@ object GradeHandler
 
     fun getPitchingGradesByPercentile(stat: String, period: String, percentileStart: String, weekNumber: String, season: String, showAvailable: String): MutableList<HolisticGrade>
     {
-        val pitchingStat    = PitchingGradeStat .valueOf(stat   .uppercase())
-        val convertedPeriod = Period            .valueOf(period .uppercase())
+        val pitchingStat    = PitchingGradeStat.valueOf(stat.uppercase())
+        val convertedPeriod = PeriodConverter.convertPeriod(period)
 
         val convertedPercentileStart    = percentileStart   .toFloat    ()
         val convertedWeekNumber         = weekNumber        .toInt      ()

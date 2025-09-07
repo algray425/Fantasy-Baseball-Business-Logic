@@ -1,6 +1,7 @@
 package com.advanced_baseball_stats
 
 import com.advanced_baseball_stats.exception.UnknownBattingStatException
+import com.advanced_baseball_stats.exception.UnknownPeriodException
 import com.advanced_baseball_stats.handler.batting.BattingStatHandler
 import com.advanced_baseball_stats.handler.game.GameStatHandler
 import com.advanced_baseball_stats.handler.grade.GradeHandler
@@ -53,7 +54,11 @@ fun Application.configureRouting() {
             }
             catch (ex: UnknownBattingStatException)
             {
-                call.respond(HttpStatusCode.InternalServerError, ex.message ?: "invalid input")
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+            catch (ex: UnknownPeriodException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
             }
         }
 
@@ -70,9 +75,19 @@ fun Application.configureRouting() {
             val pitcherHandedness   = queryParameters["batterSide"          ] ?: ""
             val stats               = queryParameters["stats"               ] ?: ""
 
+
             val statList = stats.split(",")
 
-            call.respond(PitchingStatHandler.getPitchingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList))
+            try
+            {
+                val playerStats = PitchingStatHandler.getPitchingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList)
+
+                call.respond(playerStats)
+            }
+            catch (ex: UnknownPeriodException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         get("/players/{name}")
@@ -118,7 +133,16 @@ fun Application.configureRouting() {
 
             val stats = stat.split(",")
 
-            call.respond(GradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, stats))
+            try
+            {
+                val playerGrades = GradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, stats)
+
+                call.respond(playerGrades)
+            }
+            catch (ex: UnknownPeriodException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         get("/grades/batting/{stat}/{period}/{percentileStart}/{weekNumber}/{season}")
@@ -133,7 +157,16 @@ fun Application.configureRouting() {
 
             val showAvailable = queryParameters["showAvailable"] ?: "false"
 
-            call.respond(GradeHandler.getBattingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable))
+            try
+            {
+                val playerGrades = GradeHandler.getBattingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable)
+
+                call.respond(playerGrades)
+            }
+            catch (ex: UnknownPeriodException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         get("/grades/pitching/{stat}/{period}/{percentileStart}/{weekNumber}/{season}")
@@ -148,9 +181,17 @@ fun Application.configureRouting() {
 
             val showAvailable = queryParameters["showAvailable"] ?: "false"
 
-            call.respond(GradeHandler.getPitchingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable))
-        }
+            try
+            {
+                val playerGrades = GradeHandler.getPitchingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable)
 
+                call.respond(playerGrades)
+            }
+            catch (ex: UnknownPeriodException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+        }
 
         get("/stat/batting/linearRegression/{id}/{xStat}/{yStat}/{startDate}")
         {
