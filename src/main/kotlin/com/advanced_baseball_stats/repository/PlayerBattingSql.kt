@@ -18,6 +18,7 @@ object PlayerBattingSql
     private val battingStatToColumn: Map<BattingStat, Column<Int>> = mapOf(
             BattingStat.AT_BAT          to BatterTable.b_ab
         ,   BattingStat.HIT             to BatterTable.b_h
+        ,   BattingStat.RUN             to BatterTable.b_r
         ,   BattingStat.RBI             to BatterTable.b_rbi
         ,   BattingStat.DOUBLE          to BatterTable.b_d
         ,   BattingStat.TRIPLE          to BatterTable.b_t
@@ -25,11 +26,14 @@ object PlayerBattingSql
         ,   BattingStat.WALK            to BatterTable.b_w
         ,   BattingStat.HIT_BY_PITCH    to BatterTable.b_hbp
         ,   BattingStat.SAC_FLY         to BatterTable.b_sf
+        ,   BattingStat.STRIKEOUT       to BatterTable.b_k
+        ,   BattingStat.STOLEN_BASE     to BatterTable.b_sb
     )
 
     private val columnToBattingStat: Map<Column<Int>, BattingStat> = mapOf(
             BatterTable.b_ab    to BattingStat.AT_BAT
         ,   BatterTable.b_h     to BattingStat.HIT
+        ,   BatterTable.b_r     to BattingStat.RUN
         ,   BatterTable.b_rbi   to BattingStat.RBI
         ,   BatterTable.b_d     to BattingStat.DOUBLE
         ,   BatterTable.b_t     to BattingStat.TRIPLE
@@ -37,16 +41,24 @@ object PlayerBattingSql
         ,   BatterTable.b_w     to BattingStat.WALK
         ,   BatterTable.b_hbp   to BattingStat.HIT_BY_PITCH
         ,   BatterTable.b_sf    to BattingStat.SAC_FLY
+        ,   BatterTable.b_k     to BattingStat.STRIKEOUT
+        ,   BatterTable.b_sb    to BattingStat.STOLEN_BASE
     )
 
     private val battingStatToColumnsNeeded: Map<BattingStat, List<ColumnDeclaring<*>>> = mapOf(
             BattingStat.AT_BAT                  to listOf(BatterTable.b_ab  )
         ,   BattingStat.HIT                     to listOf(BatterTable.b_h   )
+        ,   BattingStat.RUN                     to listOf(BatterTable.b_r   )
         ,   BattingStat.RBI                     to listOf(BatterTable.b_rbi )
+        ,   BattingStat.SINGLE                  to listOf(BatterTable.b_h, BatterTable.b_d, BatterTable.b_t, BatterTable.b_hr)
         ,   BattingStat.DOUBLE                  to listOf(BatterTable.b_d   )
         ,   BattingStat.TRIPLE                  to listOf(BatterTable.b_t   )
         ,   BattingStat.HOME_RUN                to listOf(BatterTable.b_hr  )
         ,   BattingStat.WALK                    to listOf(BatterTable.b_w   )
+        ,   BattingStat.HIT_BY_PITCH            to listOf(BatterTable.b_hbp )
+        ,   BattingStat.SAC_FLY                 to listOf(BatterTable.b_sf  )
+        ,   BattingStat.STRIKEOUT               to listOf(BatterTable.b_k   )
+        ,   BattingStat.STOLEN_BASE             to listOf(BatterTable.b_sb  )
         ,   BattingStat.BATTING_AVERAGE         to listOf(BatterTable.b_h, BatterTable.b_ab)
         ,   BattingStat.SLUGGING_PERCENTAGE     to listOf(BatterTable.b_h, BatterTable.b_d, BatterTable.b_t, BatterTable.b_hr, BatterTable.b_ab)
         ,   BattingStat.ON_BASE_PERCENTAGE      to listOf(BatterTable.b_h, BatterTable.b_w, BatterTable.b_hbp, BatterTable.b_sf, BatterTable.b_ab)
@@ -56,11 +68,17 @@ object PlayerBattingSql
     private val battingStatToPerGameBattingExtractor: Map<BattingStat, (QueryRowSet)->Double> = mapOf(
             BattingStat.AT_BAT                      to ::extractBattingAtBatsPerGameFromRow
         ,   BattingStat.HIT                         to ::extractBattingHitsPerGameFromRow
+        ,   BattingStat.RUN                         to ::extractBattingRunsPerGameFromRow
         ,   BattingStat.RBI                         to ::extractBattingRbisPerGameFromRow
+        ,   BattingStat.SINGLE                      to ::extractBattingSinglesPerGameFromRow
         ,   BattingStat.DOUBLE                      to ::extractBattingDoublesPerGameFromRow
         ,   BattingStat.TRIPLE                      to ::extractBattingTriplesPerGameFromRow
         ,   BattingStat.HOME_RUN                    to ::extractBattingHomeRunsPerGameFromRow
         ,   BattingStat.WALK                        to ::extractBattingWalksPerGameFromRow
+        ,   BattingStat.HIT_BY_PITCH                to ::extractBattingHitByPitchesPerGameFromRow
+        ,   BattingStat.SAC_FLY                     to ::extractBattingSacFliesPerGameFromRow
+        ,   BattingStat.STRIKEOUT                   to ::extractBattingStrikeoutsPerGameFromRow
+        ,   BattingStat.STOLEN_BASE                 to ::extractBattingStolenBasesPerGameFromRow
         ,   BattingStat.BATTING_AVERAGE             to ::extractBattingAveragePerGameFromRow
         ,   BattingStat.SLUGGING_PERCENTAGE         to ::extractSluggingPercentagePerGameFromRow
         ,   BattingStat.ON_BASE_PERCENTAGE          to ::extractOnBasePercentagePerGameFromRow
@@ -70,12 +88,17 @@ object PlayerBattingSql
     private val battingStatToAggregateBattingExtractor: Map<BattingStat, (QueryRowSet, MutableMap<BattingStat, Double>, MutableMap<BattingStat, Boolean>)->Double> = mapOf(
             BattingStat.AT_BAT                  to ::extractBattingAtBatsAggregateFromRow
         ,   BattingStat.HIT                     to ::extractBattingHitsAggregateFromRow
+        ,   BattingStat.RUN                     to ::extractBattingRunsAggregateFromRow
+        ,   BattingStat.RBI                     to ::extractBattingRbisAggregateFromRow
+        ,   BattingStat.SINGLE                  to ::extractBattingSinglesAggregateFromRow
         ,   BattingStat.DOUBLE                  to ::extractBattingDoublesAggregateFromRow
         ,   BattingStat.TRIPLE                  to ::extractBattingTriplesAggregateFromRow
         ,   BattingStat.HOME_RUN                to ::extractBattingHomeRunsAggregateFromRow
         ,   BattingStat.WALK                    to ::extractBattingWalksAggregateFromRow
         ,   BattingStat.HIT_BY_PITCH            to ::extractBattingHitByPitchesAggregateFromRow
         ,   BattingStat.SAC_FLY                 to ::extractBattingSacFliesAggregateFromRow
+        ,   BattingStat.STRIKEOUT               to ::extractBattingStrikeoutsAggregateFromRow
+        ,   BattingStat.STOLEN_BASE             to ::extractBattingStolenBasesAggregateFromRow
         ,   BattingStat.BATTING_AVERAGE         to ::extractBattingAverageAggregateFromRow
         ,   BattingStat.SLUGGING_PERCENTAGE     to ::extractSluggingPercentageAggregateFromRow
         ,   BattingStat.ON_BASE_PERCENTAGE      to ::extractOnBasePercentageAggregateFromRow
@@ -176,6 +199,16 @@ object PlayerBattingSql
         return extractBattingStatAggregateFromRow(row, BattingStat.HIT, battingStatToSum, updated)
     }
 
+    private fun extractBattingRunsAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
+    {
+        return extractBattingStatAggregateFromRow(row, BattingStat.RUN, battingStatToSum, updated)
+    }
+
+    private fun extractBattingRbisAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
+    {
+        return extractBattingStatAggregateFromRow(row, BattingStat.RBI, battingStatToSum, updated)
+    }
+
     private fun extractBattingDoublesAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
     {
         return extractBattingStatAggregateFromRow(row, BattingStat.DOUBLE, battingStatToSum, updated)
@@ -204,6 +237,28 @@ object PlayerBattingSql
     private fun extractBattingSacFliesAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
     {
         return extractBattingStatAggregateFromRow(row, BattingStat.SAC_FLY, battingStatToSum, updated)
+    }
+
+    private fun extractBattingStrikeoutsAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
+    {
+        return extractBattingStatAggregateFromRow(row, BattingStat.STRIKEOUT, battingStatToSum, updated)
+    }
+
+    private fun extractBattingStolenBasesAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
+    {
+        return extractBattingStatAggregateFromRow(row, BattingStat.STOLEN_BASE, battingStatToSum, updated)
+    }
+
+    private fun extractBattingSinglesAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
+    {
+        val hits        = extractBattingStatAggregateFromRow(row, BattingStat.HIT       , battingStatToSum, updated)
+        val doubles     = extractBattingStatAggregateFromRow(row, BattingStat.DOUBLE    , battingStatToSum, updated)
+        val triples     = extractBattingStatAggregateFromRow(row, BattingStat.TRIPLE    , battingStatToSum, updated)
+        val homeRuns    = extractBattingStatAggregateFromRow(row, BattingStat.HOME_RUN  , battingStatToSum, updated)
+
+        val singles = hits - doubles - triples - homeRuns
+
+        return singles
     }
 
     private fun extractBattingAverageAggregateFromRow(row: QueryRowSet, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
@@ -325,6 +380,21 @@ object PlayerBattingSql
         return extractBattingStatPerGameFromRow(row, BattingStat.HIT)
     }
 
+    private fun extractBattingRunsPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractBattingStatPerGameFromRow(row, BattingStat.RUN)
+    }
+
+    private fun extractBattingStrikeoutsPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractBattingStatPerGameFromRow(row, BattingStat.STRIKEOUT)
+    }
+
+    private fun extractBattingStolenBasesPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractBattingStatPerGameFromRow(row, BattingStat.STOLEN_BASE)
+    }
+
     private fun extractBattingDoublesPerGameFromRow(row: QueryRowSet): Double
     {
         return extractBattingStatPerGameFromRow(row, BattingStat.DOUBLE)
@@ -358,6 +428,18 @@ object PlayerBattingSql
     private fun extractBattingSacFliesPerGameFromRow(row: QueryRowSet): Double
     {
         return extractBattingStatPerGameFromRow(row, BattingStat.SAC_FLY)
+    }
+
+    private fun extractBattingSinglesPerGameFromRow(row: QueryRowSet): Double
+    {
+        val hits        = extractBattingHitsPerGameFromRow      (row)
+        val doubles     = extractBattingDoublesPerGameFromRow   (row)
+        val triples     = extractBattingTriplesPerGameFromRow   (row)
+        val homeRuns    = extractBattingHomeRunsPerGameFromRow  (row)
+
+        val singles = hits - doubles - triples - homeRuns
+
+        return singles
     }
 
     private fun extractBattingAveragePerGameFromRow(row: QueryRowSet): Double
