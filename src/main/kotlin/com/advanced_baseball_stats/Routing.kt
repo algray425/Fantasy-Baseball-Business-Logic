@@ -143,6 +143,10 @@ fun Application.configureRouting() {
             {
                 call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
             }
+            catch (ex: UnknownBattingStatException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         get("/grades/batting/{stat}/{period}/{percentileStart}/{weekNumber}/{season}")
@@ -164,6 +168,10 @@ fun Application.configureRouting() {
                 call.respond(playerGrades)
             }
             catch (ex: UnknownPeriodException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+            catch (ex: UnknownBattingStatException)
             {
                 call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
             }
@@ -200,7 +208,16 @@ fun Application.configureRouting() {
             val yStat       = call.parameters["yStat"       ].toString()
             val startDate   = call.parameters["startDate"   ].toString()
 
-            call.respond(MathStatHandler.getLinearRegression(id, xStat, yStat, startDate))
+            try
+            {
+                val linearRegression = MathStatHandler.getLinearRegression(id, xStat, yStat, startDate)
+
+                call.respond(linearRegression)
+            }
+            catch (ex: UnknownBattingStatException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         get("/stat/batting/mean/{id}/{xStat}/{yStat}/{startDate}")
@@ -210,7 +227,16 @@ fun Application.configureRouting() {
             val yStat       = call.parameters["yStat"       ].toString()
             val startDate   = call.parameters["startDate"   ].toString()
 
-            call.respond(MathStatHandler.getMeanValues(id, xStat, yStat, startDate))
+            try
+            {
+                val meanValues = MathStatHandler.getMeanValues(id, xStat, yStat, startDate)
+
+                call.respond(meanValues)
+            }
+            catch (ex: UnknownBattingStatException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
     }
 }

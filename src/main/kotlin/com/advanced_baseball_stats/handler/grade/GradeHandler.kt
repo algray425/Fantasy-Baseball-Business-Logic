@@ -5,6 +5,7 @@ import com.advanced_baseball_stats.model.grades.HolisticBattingGrade
 import com.advanced_baseball_stats.model.common.Period
 import com.advanced_baseball_stats.model.grades.HolisticGrade
 import com.advanced_baseball_stats.model.grades.PitchingGradeStat
+import com.advanced_baseball_stats.utility.converter.BattingStatConverter
 import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
 object GradeHandler
@@ -42,7 +43,8 @@ object GradeHandler
             }
             else
             {
-                val curStat = BattingStat.valueOf(stat.uppercase())
+                val curStat = BattingStatConverter.convertBattingStat(stat.uppercase())
+
                 battingStats.add(curStat)
             }
         }
@@ -59,8 +61,8 @@ object GradeHandler
 
     fun getBattingGradesByPercentile(stat: String, period: String, percentileStart: String, weekNumber: String, season: String, showAvailable: String): MutableList<HolisticGrade>
     {
-        val battingStat     = BattingStat.valueOf(stat.uppercase())
-        val convertedPeriod = PeriodConverter.convertPeriod(period)
+        val battingStat     = BattingStatConverter  .convertBattingStat (stat.uppercase())
+        val convertedPeriod = PeriodConverter       .convertPeriod      (period)
 
         val convertedPercentileStart    = percentileStart   .toFloat    ()
         val convertedWeekNumber         = weekNumber        .toInt      ()

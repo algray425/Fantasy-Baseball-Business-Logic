@@ -7,6 +7,7 @@ import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.batting.HolisticBattingStatistic
 import com.advanced_baseball_stats.model.math.LinearRegression
 import com.advanced_baseball_stats.model.math.MeanValues
+import com.advanced_baseball_stats.utility.converter.BattingStatConverter
 
 object MathStatHandler
 {
@@ -21,7 +22,7 @@ object MathStatHandler
 
     fun getLinearRegression(id: String, xStat: String, yStat: String, startDate: String): LinearRegression
     {
-        val yBattingStat = BattingStat.valueOf(yStat.uppercase())
+        val yBattingStat = BattingStatConverter.convertBattingStat(yStat.uppercase())
 
         if (isGameSpecificStat(xStat))
         {
@@ -47,7 +48,7 @@ object MathStatHandler
         }
         else
         {
-            val xBattingStat = BattingStat.valueOf(xStat.uppercase())
+            val xBattingStat = BattingStatConverter.convertBattingStat(xStat.uppercase())
 
             val stats = perGameBattingStatHandler.getStats(id, "", "", startDate, "", listOf(xBattingStat, yBattingStat))
 
@@ -75,7 +76,7 @@ object MathStatHandler
 
     fun getMeanValues(id: String, xStat: String, yStat: String, startDate: String) : MeanValues
     {
-        val yBattingStat = BattingStat.valueOf(yStat.uppercase())
+        val yBattingStat = BattingStatConverter.convertBattingStat(yStat.uppercase())
 
         val stats = perGameBattingStatHandler.getStats(id, "", "", startDate, "", listOf(yBattingStat))
 
@@ -84,8 +85,6 @@ object MathStatHandler
 
         for (game in stats.games)
         {
-            val stats = game.stats
-
             val holisticYStat = game.stats.find { stat -> stat.statName == yBattingStat }
 
             val curX = getCurXValueMean(xStat, game)

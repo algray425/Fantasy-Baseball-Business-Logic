@@ -1,8 +1,8 @@
 package com.advanced_baseball_stats.handler.batting
 
-import com.advanced_baseball_stats.exception.UnknownBattingStatException
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.common.Period
+import com.advanced_baseball_stats.utility.converter.BattingStatConverter
 import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
 object BattingStatHandler
@@ -17,16 +17,9 @@ object BattingStatHandler
 
         for (stat in statList)
         {
-            try
-            {
-                val battingStat = BattingStat.valueOf(stat)
+            val battingStat = BattingStatConverter.convertBattingStat(stat.uppercase())
 
-                battingStatList.add(battingStat)
-            }
-            catch (ex: IllegalArgumentException)
-            {
-                throw UnknownBattingStatException("$stat is not a valid batting stat!")
-            }
+            battingStatList.add(battingStat)
         }
 
         val convertedPeriod = PeriodConverter.convertPeriod(period)
