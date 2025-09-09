@@ -5,11 +5,17 @@ Code
     - Add metrics
     - Add unit tests
     - cleanup import statements (ie everywhere with *)
+    - Cleanup roster pull logic in PlayerGradeSql
+
+Tests
+   - Add unit tests
+   - Add kover coverage
 
 Features
     - Player bio updates
         - Position
         - Team
+    - Automate fantasy roster updates
     - Caching
     - Consistency rankings
     - Lineup optimizer
