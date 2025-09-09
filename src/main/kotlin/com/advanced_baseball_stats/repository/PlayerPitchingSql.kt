@@ -17,21 +17,14 @@ import java.math.RoundingMode
 
 object PlayerPitchingSql
 {
-    private val pitchingStatToColumnsNeeded: Map<PitchingStat, List<ColumnDeclaring<*>>> = mapOf(
-            PitchingStat.ERA                    to listOf(PitcherTable.p_er, PitcherTable.p_ipouts)
-        ,   PitchingStat.WHIP                   to listOf(PitcherTable.p_h, PitcherTable.p_w, PitcherTable.p_ipouts)
-        ,   PitchingStat.STRIKE_OUTS_PER_NINE   to listOf(PitcherTable.p_k, PitcherTable.p_ipouts)
-        ,   PitchingStat.QUALITY_START          to listOf(PitcherTable.p_er, PitcherTable.p_ipouts)
-        ,   PitchingStat.EARNED_RUNS            to listOf(PitcherTable.p_er)
-        ,   PitchingStat.OUTS                   to listOf(PitcherTable.p_ipouts)
-        ,   PitchingStat.HITS                   to listOf(PitcherTable.p_h)
-        ,   PitchingStat.WALKS                  to listOf(PitcherTable.p_w)
-        ,   PitchingStat.STRIKE_OUTS            to listOf(PitcherTable.p_k)
-    )
-
     private val columnToPitchingStat: Map<Column<Int>, PitchingStat> = mapOf(
             PitcherTable.p_er       to PitchingStat.EARNED_RUNS
         ,   PitcherTable.p_ipouts   to PitchingStat.OUTS
+        ,   PitcherTable.p_r        to PitchingStat.RUNS
+        ,   PitcherTable.p_h        to PitchingStat.HITS
+        ,   PitcherTable.p_d        to PitchingStat.DOUBLES
+        ,   PitcherTable.p_t        to PitchingStat.TRIPLES
+        ,   PitcherTable.p_hr       to PitchingStat.HOME_RUNS
         ,   PitcherTable.p_h        to PitchingStat.HITS
         ,   PitcherTable.p_w        to PitchingStat.WALKS
         ,   PitcherTable.p_k        to PitchingStat.STRIKE_OUTS
@@ -40,33 +33,66 @@ object PlayerPitchingSql
     private val pitchingStatToColumn: Map<PitchingStat, Column<Int>> = mapOf(
             PitchingStat.EARNED_RUNS    to PitcherTable.p_er
         ,   PitchingStat.OUTS           to PitcherTable.p_ipouts
+        ,   PitchingStat.RUNS           to PitcherTable.p_r
+        ,   PitchingStat.HITS           to PitcherTable.p_h
+        ,   PitchingStat.DOUBLES        to PitcherTable.p_d
+        ,   PitchingStat.TRIPLES        to PitcherTable.p_t
+        ,   PitchingStat.HOME_RUNS      to PitcherTable.p_hr
         ,   PitchingStat.HITS           to PitcherTable.p_h
         ,   PitchingStat.WALKS          to PitcherTable.p_w
         ,   PitchingStat.STRIKE_OUTS    to PitcherTable.p_k
     )
 
+    private val pitchingStatToColumnsNeeded: Map<PitchingStat, List<ColumnDeclaring<*>>> = mapOf(
+            PitchingStat.HITS                   to listOf(PitcherTable.p_h)
+        ,   PitchingStat.SINGLES                to listOf(PitcherTable.p_h, PitcherTable.p_d, PitcherTable.p_t, PitcherTable.p_hr)
+        ,   PitchingStat.DOUBLES                to listOf(PitcherTable.p_d)
+        ,   PitchingStat.TRIPLES                to listOf(PitcherTable.p_t)
+        ,   PitchingStat.HOME_RUNS              to listOf(PitcherTable.p_hr)
+        ,   PitchingStat.RUNS                   to listOf(PitcherTable.p_r)
+        ,   PitchingStat.EARNED_RUNS            to listOf(PitcherTable.p_er)
+        ,   PitchingStat.WALKS                  to listOf(PitcherTable.p_w)
+        ,   PitchingStat.STRIKE_OUTS            to listOf(PitcherTable.p_k)
+        ,   PitchingStat.OUTS                   to listOf(PitcherTable.p_ipouts)
+        ,   PitchingStat.ERA                    to listOf(PitcherTable.p_er, PitcherTable.p_ipouts)
+        ,   PitchingStat.WHIP                   to listOf(PitcherTable.p_h, PitcherTable.p_w, PitcherTable.p_ipouts)
+        ,   PitchingStat.STRIKE_OUTS_PER_NINE   to listOf(PitcherTable.p_k, PitcherTable.p_ipouts)
+        ,   PitchingStat.QUALITY_START          to listOf(PitcherTable.p_er, PitcherTable.p_ipouts)
+    )
+
     private val pitchingStatToAggregatePitchingExtractor: Map<PitchingStat, (QueryRowSet, MutableMap<PitchingStat, Double>, MutableMap<PitchingStat, Boolean>)->Double> = mapOf(
-            PitchingStat.ERA                    to ::extractEraAggregateFromRow
+
+            PitchingStat.HITS                   to ::extractPitchingHitsAggregateFromRow
+        ,   PitchingStat.SINGLES                to ::extractPitchingSinglesAggregateFromRow
+        ,   PitchingStat.DOUBLES                to ::extractPitchingDoublesAggregateFromRow
+        ,   PitchingStat.TRIPLES                to ::extractPitchingTriplesAggregateFromRow
+        ,   PitchingStat.HOME_RUNS              to ::extractPitchingHomeRunsAggregateFromRow
+        ,   PitchingStat.RUNS                   to ::extractPitchingRunsAggregateFromRow
+        ,   PitchingStat.EARNED_RUNS            to ::extractPitchingEarnedRunsAggregateFromRow
+        ,   PitchingStat.WALKS                  to ::extractPitchingWalksAggregateFromRow
+        ,   PitchingStat.STRIKE_OUTS            to ::extractPitchingStrikeOutsAggregateFromRow
+        ,   PitchingStat.OUTS                   to ::extractPitchingOutsAggregateFromRow
+        ,   PitchingStat.HITS                   to ::extractPitchingHitsAggregateFromRow
+        ,   PitchingStat.ERA                    to ::extractEraAggregateFromRow
         ,   PitchingStat.WHIP                   to ::extractWhipAggregateGameFromRow
         ,   PitchingStat.STRIKE_OUTS_PER_NINE   to ::extractStrikeOutsPerNineAggregateFromRow
         ,   PitchingStat.QUALITY_START          to ::extractQualityStartsAggregateFromRow
-        ,   PitchingStat.EARNED_RUNS            to ::extractPitchingEarnedRunsAggregateFromRow
-        ,   PitchingStat.OUTS                   to ::extractPitchingOutsAggregateFromRow
-        ,   PitchingStat.HITS                   to ::extractPitchingHitsAggregateFromRow
-        ,   PitchingStat.WALKS                  to ::extractPitchingWalksAggregateFromRow
-        ,   PitchingStat.STRIKE_OUTS            to ::extractPitchingStrikeOutsAggregateFromRow
     )
 
     private val pitchingStatToPerGamePitchingExtractor: Map<PitchingStat, (QueryRowSet) -> Double> = mapOf(
-            PitchingStat.ERA                    to ::extractEraPerGameFromRow
-        ,   PitchingStat.WHIP                   to ::extractWhipPerGameFromRow
-        ,   PitchingStat.STRIKE_OUTS_PER_NINE   to ::extractStrikeOutsPerNinePerGameFromRow
-        ,   PitchingStat.QUALITY_START          to ::extractQualityStartsPerGameFromRow
+            PitchingStat.HITS                   to ::extractPitchingHitsPerGameFromRow
+        ,   PitchingStat.SINGLES                to ::extractPitchingSinglesPerGameFromRow
+        ,   PitchingStat.DOUBLES                to ::extractPitchingDoublesPerGameFromRow
+        ,   PitchingStat.TRIPLES                to ::extractPitchingTriplesPerGameFromRow
+        ,   PitchingStat.HOME_RUNS              to ::extractPitchingHomeRunsPerGameFromRow
+        ,   PitchingStat.RUNS                   to ::extractPitchingRunsPerGameFromRow
         ,   PitchingStat.EARNED_RUNS            to ::extractEarnedRunsPerGameFromRow
-        ,   PitchingStat.OUTS                   to ::extractPitchingOutsPerGameFromRow
-        ,   PitchingStat.HITS                   to ::extractPitchingHitsPerGameFromRow
         ,   PitchingStat.WALKS                  to ::extractPitchingWalksPerGameFromRow
         ,   PitchingStat.STRIKE_OUTS            to ::extractPitchingStrikeOutsPerGameFromRow
+        ,   PitchingStat.OUTS                   to ::extractPitchingOutsPerGameFromRow
+        ,   PitchingStat.ERA                    to ::extractEraPerGameFromRow
+        ,   PitchingStat.WHIP                   to ::extractWhipPerGameFromRow
+        ,   PitchingStat.STRIKE_OUTS_PER_NINE   to ::extractStrikeOutsPerNinePerGameFromRow
         ,   PitchingStat.QUALITY_START          to ::extractQualityStartsPerGameFromRow
     )
 
@@ -208,6 +234,26 @@ object PlayerPitchingSql
         return extractPitchingStatAggregateFromRow(row, PitchingStat.HITS, pitchingStatToSum, updated)
     }
 
+    private fun extractPitchingDoublesAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
+    {
+        return extractPitchingStatAggregateFromRow(row, PitchingStat.DOUBLES, pitchingStatToSum, updated)
+    }
+
+    private fun extractPitchingTriplesAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
+    {
+        return extractPitchingStatAggregateFromRow(row, PitchingStat.TRIPLES, pitchingStatToSum, updated)
+    }
+
+    private fun extractPitchingHomeRunsAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
+    {
+        return extractPitchingStatAggregateFromRow(row, PitchingStat.HOME_RUNS, pitchingStatToSum, updated)
+    }
+
+    private fun extractPitchingRunsAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
+    {
+        return extractPitchingStatAggregateFromRow(row, PitchingStat.RUNS, pitchingStatToSum, updated)
+    }
+
     private fun extractPitchingWalksAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
     {
         return extractPitchingStatAggregateFromRow(row, PitchingStat.WALKS, pitchingStatToSum, updated)
@@ -216,6 +262,18 @@ object PlayerPitchingSql
     private fun extractPitchingStrikeOutsAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
     {
         return extractPitchingStatAggregateFromRow(row, PitchingStat.STRIKE_OUTS, pitchingStatToSum, updated)
+    }
+
+    private fun extractPitchingSinglesAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
+    {
+        val hits        = extractPitchingHitsAggregateFromRow       (row, pitchingStatToSum, updated)
+        val doubles     = extractPitchingDoublesAggregateFromRow    (row, pitchingStatToSum, updated)
+        val triples     = extractPitchingTriplesAggregateFromRow    (row, pitchingStatToSum, updated)
+        val homeRuns    = extractPitchingHomeRunsAggregateFromRow   (row, pitchingStatToSum, updated)
+
+        val singles = hits - doubles - triples - homeRuns
+
+        return singles
     }
 
     private fun extractEraAggregateFromRow(row: QueryRowSet, pitchingStatToSum: MutableMap<PitchingStat, Double>, updated: MutableMap<PitchingStat, Boolean>): Double
@@ -351,6 +409,26 @@ object PlayerPitchingSql
         return extractPitchingStatPerGameFromRow(row, PitchingStat.HITS)
     }
 
+    private fun extractPitchingDoublesPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractPitchingStatPerGameFromRow(row, PitchingStat.DOUBLES)
+    }
+
+    private fun extractPitchingTriplesPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractPitchingStatPerGameFromRow(row, PitchingStat.TRIPLES)
+    }
+
+    private fun extractPitchingHomeRunsPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractPitchingStatPerGameFromRow(row, PitchingStat.HOME_RUNS)
+    }
+
+    private fun extractPitchingRunsPerGameFromRow(row: QueryRowSet): Double
+    {
+        return extractPitchingStatPerGameFromRow(row, PitchingStat.RUNS)
+    }
+
     private fun extractPitchingWalksPerGameFromRow(row: QueryRowSet): Double
     {
         return extractPitchingStatPerGameFromRow(row, PitchingStat.WALKS)
@@ -359,6 +437,18 @@ object PlayerPitchingSql
     private fun extractPitchingStrikeOutsPerGameFromRow(row: QueryRowSet): Double
     {
         return extractPitchingStatPerGameFromRow(row, PitchingStat.STRIKE_OUTS)
+    }
+
+    private fun extractPitchingSinglesPerGameFromRow(row: QueryRowSet): Double
+    {
+        val hits        = extractPitchingHitsPerGameFromRow     (row)
+        val doubles     = extractPitchingDoublesPerGameFromRow  (row)
+        val triples     = extractPitchingTriplesPerGameFromRow  (row)
+        val homeRuns    = extractPitchingHomeRunsPerGameFromRow (row)
+
+        val singles = hits - doubles - triples - homeRuns
+
+        return singles
     }
 
     private fun extractEraPerGameFromRow(row: QueryRowSet): Double

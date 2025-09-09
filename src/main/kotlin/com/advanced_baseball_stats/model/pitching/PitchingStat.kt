@@ -3,6 +3,7 @@ package com.advanced_baseball_stats.model.pitching
 enum class PitchingStat
 {
         HITS
+    ,   SINGLES
     ,   DOUBLES
     ,   TRIPLES
     ,   HOME_RUNS
