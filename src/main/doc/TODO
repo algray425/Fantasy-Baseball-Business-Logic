@@ -9,12 +9,14 @@ Code
 
 Tests
    - Add unit tests
+      - Fix linear regression helper test
    - Add kover coverage
 
 Features
     - Player bio updates
         - Position
         - Team
+    - Add player vs. pitching stats to aggregate batting stat handler
     - Automate fantasy roster updates
     - Caching
     - Consistency rankings
