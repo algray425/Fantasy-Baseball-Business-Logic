@@ -5,12 +5,12 @@ import com.advanced_baseball_stats.model.common.Period
 import com.advanced_baseball_stats.utility.converter.BattingStatConverter
 import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
-object BattingStatHandler
+class BattingStatHandler(
+      private val perGameBattingStatHandler   : PerGameBattingStatHandler
+    , private val aggregateBattingStatHandler : AggregateBattingStatHandler
+    , private val totalBattingStatHandler     : TotalBattingStatHandler
+)
 {
-    private val perGameBattingStatHandler   = PerGameBattingStatHandler     ()
-    private val aggregateBattingStatHandler = AggregateBattingStatHandler   ()
-    private val totalBattingStatHandler     = TotalBattingStatHandler       ()
-
     fun getBattingStatV2(id: String, pitcherId: String, pitcherHandedness: String, period: String, startDate: String, endDate: String, statList: List<String>): Any
     {
         val battingStatList = mutableListOf<BattingStat>()
