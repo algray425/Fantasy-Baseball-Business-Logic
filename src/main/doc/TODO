@@ -1,14 +1,13 @@
 Code
     - Add null checks EVERYWHERE!
-    - Add custom exceptions
-       - What to return when exceptions are thrown? empty model, exception messaging, both?
+    - Add custom exceptions (IN PROGRESS)
     - Add metrics
-    - Add unit tests
     - cleanup import statements (ie everywhere with *)
     - Cleanup roster pull logic in PlayerGradeSql
+    - Sum everything in SQL rather than summing it in application code
 
 Tests
-   - Add unit tests
+   - Add unit tests (IN PROGRESS)
       - Fix linear regression helper test
    - Add kover coverage
 
