@@ -4,14 +4,16 @@ import com.advanced_baseball_stats.common.BattingStatCommons.AWAY_TEAM
 import com.advanced_baseball_stats.common.BattingStatCommons.CONDITION
 import com.advanced_baseball_stats.common.BattingStatCommons.CURRENT_END_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.EMPTY_END_DATE
+import com.advanced_baseball_stats.common.BattingStatCommons.EMPTY_PITCHER_HANDEDNESS
+import com.advanced_baseball_stats.common.BattingStatCommons.EMPTY_PITCHER_ID
 import com.advanced_baseball_stats.common.BattingStatCommons.END_DATE
-import com.advanced_baseball_stats.common.BattingStatCommons.FIRST_BATTING_GAME_STAT
-import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST
-import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_EMPTY_END_DATE
+import com.advanced_baseball_stats.common.BattingStatCommons.FIRST_BATTING_GAME_STAT_HIT
+import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_HIT
+import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.HOME_TEAM
 import com.advanced_baseball_stats.common.BattingStatCommons.ID
 import com.advanced_baseball_stats.common.BattingStatCommons.PRECIPITATION
-import com.advanced_baseball_stats.common.BattingStatCommons.SECOND_BATTING_GAME_STAT
+import com.advanced_baseball_stats.common.BattingStatCommons.SECOND_BATTING_GAME_STAT_HIT
 import com.advanced_baseball_stats.common.BattingStatCommons.START_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.STAT_LIST
 import com.advanced_baseball_stats.common.BattingStatCommons.TEMP
@@ -38,17 +40,15 @@ class PerGameBattingStatHandlerTest
     private val handler = PerGameBattingStatHandler()
 
     private val PITCHER_ID                  = "valdf001"
-    private val EMPTY_PITCHER_ID            = ""
     private val PITCHER_HANDEDNESS          = "R"
-    private val EMPTY_PITCHER_HANDEDNESS    = ""
 
     private val THIRD_GID   = "GID3"
     private val FOURTH_GID  = "GID4"
 
     private val THIRD_GAME                                              = Game(THIRD_GID, TEMP, WIND_SPEED, WIND_DIRECTION, CONDITION, PRECIPITATION, TIME_OF_DAY, HOME_TEAM, AWAY_TEAM)
     private val FOURTH_GAME                                             = Game(FOURTH_GID, TEMP, WIND_SPEED, WIND_DIRECTION, CONDITION, PRECIPITATION, TIME_OF_DAY, HOME_TEAM, AWAY_TEAM)
-    private val THIRD_BATTING_GAME                                      = BattingGame(THIRD_GAME, mutableListOf(FIRST_BATTING_GAME_STAT))
-    private val FOURTH_BATTING_GAME                                     = BattingGame(FOURTH_GAME, mutableListOf(SECOND_BATTING_GAME_STAT))
+    private val THIRD_BATTING_GAME                                      = BattingGame(THIRD_GAME, mutableListOf(FIRST_BATTING_GAME_STAT_HIT))
+    private val FOURTH_BATTING_GAME                                     = BattingGame(FOURTH_GAME, mutableListOf(SECOND_BATTING_GAME_STAT_HIT))
     private val HOLISTIC_BATTING_STAT_LIST_FROM_PLAYS                   = HolisticBattingStatList(ID, listOf(THIRD_BATTING_GAME))
     private val HOLISTIC_BATTING_STAT_LIST_FROM_PLAYS_EMPTY_END_DATE    = HolisticBattingStatList(ID, listOf(THIRD_BATTING_GAME, FOURTH_BATTING_GAME))
 
@@ -57,8 +57,8 @@ class PerGameBattingStatHandlerTest
     {
         mockkObject(PlayerBattingSql)
 
-        every { PlayerBattingSql.getBattingStatsPerGame(ID, START_DATE, END_DATE            , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST
-        every { PlayerBattingSql.getBattingStatsPerGame(ID, START_DATE, CURRENT_END_DATE    , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST_EMPTY_END_DATE
+        every { PlayerBattingSql.getBattingStatsPerGame(ID, START_DATE, END_DATE            , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST_HIT
+        every { PlayerBattingSql.getBattingStatsPerGame(ID, START_DATE, CURRENT_END_DATE    , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE
 
         mockkObject(PlaysSql)
 
@@ -81,7 +81,7 @@ class PerGameBattingStatHandlerTest
     {
         val stats = this.handler.getStats(ID, EMPTY_PITCHER_ID, EMPTY_PITCHER_HANDEDNESS, START_DATE, END_DATE, STAT_LIST)
 
-        assertEquals(HOLISTIC_BATTING_STAT_LIST, stats)
+        assertEquals(HOLISTIC_BATTING_STAT_LIST_HIT, stats)
     }
 
     @Test
@@ -89,7 +89,7 @@ class PerGameBattingStatHandlerTest
     {
         val stats = this.handler.getStats(ID, EMPTY_PITCHER_ID, EMPTY_PITCHER_HANDEDNESS, START_DATE, EMPTY_END_DATE, STAT_LIST)
 
-        assertEquals(HOLISTIC_BATTING_STAT_LIST_EMPTY_END_DATE, stats)
+        assertEquals(HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE, stats)
     }
 
     @Test

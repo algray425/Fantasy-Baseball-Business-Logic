@@ -11,7 +11,7 @@ class BattingStatHandler(
     , private val totalBattingStatHandler     : TotalBattingStatHandler
 )
 {
-    fun getBattingStatV2(id: String, pitcherId: String, pitcherHandedness: String, period: String, startDate: String, endDate: String, statList: List<String>): Any
+    fun getBattingStats(id: String, pitcherId: String, pitcherHandedness: String, period: String, startDate: String, endDate: String, statList: List<String>): Any
     {
         val battingStatList = mutableListOf<BattingStat>()
 

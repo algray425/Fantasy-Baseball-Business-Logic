@@ -48,7 +48,7 @@ fun Application.configureRouting(battingStatHandler: BattingStatHandler) {
 
             try
             {
-                val playerStats = battingStatHandler.getBattingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList)
+                val playerStats = battingStatHandler.getBattingStats(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList)
 
                 call.respond(playerStats)
             }

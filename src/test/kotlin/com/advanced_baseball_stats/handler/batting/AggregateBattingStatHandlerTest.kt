@@ -3,8 +3,8 @@ package com.advanced_baseball_stats.handler.batting
 import com.advanced_baseball_stats.common.BattingStatCommons.CURRENT_END_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.EMPTY_END_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.END_DATE
-import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST
-import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_EMPTY_END_DATE
+import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_HIT
+import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.ID
 import com.advanced_baseball_stats.common.BattingStatCommons.START_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.STAT_LIST
@@ -28,8 +28,8 @@ class AggregateBattingStatHandlerTest
     {
         mockkObject(PlayerBattingSql)
 
-        every { PlayerBattingSql.getBattingStatsAggregate(ID, START_DATE, END_DATE          , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST
-        every { PlayerBattingSql.getBattingStatsAggregate(ID, START_DATE, CURRENT_END_DATE  , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST_EMPTY_END_DATE
+        every { PlayerBattingSql.getBattingStatsAggregate(ID, START_DATE, END_DATE          , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST_HIT
+        every { PlayerBattingSql.getBattingStatsAggregate(ID, START_DATE, CURRENT_END_DATE  , STAT_LIST) } returns HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE
 
         mockkObject(DateHelper)
 
@@ -47,7 +47,7 @@ class AggregateBattingStatHandlerTest
     {
         val stats = this.handler.getStats(ID, START_DATE, END_DATE, STAT_LIST)
 
-        assertEquals(HOLISTIC_BATTING_STAT_LIST, stats)
+        assertEquals(HOLISTIC_BATTING_STAT_LIST_HIT, stats)
     }
 
     @Test
@@ -55,6 +55,6 @@ class AggregateBattingStatHandlerTest
     {
         val stats = this.handler.getStats(ID, START_DATE, EMPTY_END_DATE, STAT_LIST)
 
-        assertEquals(HOLISTIC_BATTING_STAT_LIST_EMPTY_END_DATE, stats)
+        assertEquals(HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE, stats)
     }
 }
