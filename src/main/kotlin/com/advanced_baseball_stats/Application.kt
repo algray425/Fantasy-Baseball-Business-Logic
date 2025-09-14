@@ -4,6 +4,9 @@ import com.advanced_baseball_stats.handler.batting.AggregateBattingStatHandler
 import com.advanced_baseball_stats.handler.batting.BattingStatHandler
 import com.advanced_baseball_stats.handler.batting.PerGameBattingStatHandler
 import com.advanced_baseball_stats.handler.batting.TotalBattingStatHandler
+import com.advanced_baseball_stats.handler.pitching.AggregatePitchingStatHandler
+import com.advanced_baseball_stats.handler.pitching.PerGamePitchingStatHandler
+import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -18,7 +21,12 @@ fun Application.module()
 
     val battingStatHandler = BattingStatHandler(perGameBattingStatHandler, aggregateBattingStatHandler, totalBattingStatHandler)
 
+    val perGamePitchingStatHandler      = PerGamePitchingStatHandler    ()
+    val aggregatePitchingStatHandler    = AggregatePitchingStatHandler  ()
+
+    val pitchingStatHandler = PitchingStatHandler(perGamePitchingStatHandler, aggregatePitchingStatHandler)
+
     configureSerialization  ()
     configureCors           ()
-    configureRouting        (battingStatHandler)
+    configureRouting        (battingStatHandler, pitchingStatHandler)
 }

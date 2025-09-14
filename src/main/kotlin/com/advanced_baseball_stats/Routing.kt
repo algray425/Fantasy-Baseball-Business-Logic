@@ -15,7 +15,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting(battingStatHandler: BattingStatHandler) {
+fun Application.configureRouting(
+        battingStatHandler  : BattingStatHandler
+    ,   pitchingStatHandler : PitchingStatHandler
+){
     routing {
         get("/")
         {
@@ -80,7 +83,7 @@ fun Application.configureRouting(battingStatHandler: BattingStatHandler) {
 
             try
             {
-                val playerStats = PitchingStatHandler.getPitchingStatV2(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList)
+                val playerStats = pitchingStatHandler.getPitchingStats(id, pitcherId, pitcherHandedness, period, startDate, endDate, statList)
 
                 call.respond(playerStats)
             }
