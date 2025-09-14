@@ -5,6 +5,8 @@ Code
     - cleanup import statements (ie everywhere with *)
     - Cleanup roster pull logic in PlayerGradeSql
     - Sum everything in SQL rather than summing it in application code
+    - Cleanup routing implementation
+       - organize routes into subroutes
 
 Tests
    - Add unit tests (IN PROGRESS)
