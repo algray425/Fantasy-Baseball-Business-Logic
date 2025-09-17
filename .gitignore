@@ -131,4 +131,3 @@ hs_err_pid*
 .gradletasknamecache
 
 # Project specific ignores
-src/main/kotlin/com/advanced_baseball_stats/repository/helper/database/DatabaseConstants.kt
