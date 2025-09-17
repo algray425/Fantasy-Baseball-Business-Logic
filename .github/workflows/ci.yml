@@ -1,0 +1,26 @@
+name: Kotlin CI with Corretto
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK with Corretto
+        uses: actions/setup-java@v4
+        with:
+          java-version: '20'
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run unit tests with Gradle
+        run: ./gradlew test

@@ -9,15 +9,16 @@ class LinearRegressionHelper
 {
     fun getLinearRegression(x: List<Double>, y: List<Double>) : LinearRegression?
     {
+        if (x.size != y.size)
+        {
+            return null
+        }
+
         val normalizedStats = this.getNormalizedValues(x, y)
 
         val normalizedX = normalizedStats.first
         val normalizedY = normalizedStats.second
 
-        if (normalizedX.size != normalizedY.size)
-        {
-            return null
-        }
 
         val xAvg = normalizedX.average()
         val yAvg = normalizedY.average()
