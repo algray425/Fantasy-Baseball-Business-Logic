@@ -59,3 +59,13 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
     testImplementation("io.mockk:mockk:1.13.10")
 }
+
+tasks.withType<Test> {
+    testLogging {
+        showStandardStreams = true // Show System.out and System.err
+        events("PASSED", "FAILED", "SKIPPED", "STANDARD_OUT", "STANDARD_ERROR")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showCauses = true
+        showStackTraces = true
+    }
+}
