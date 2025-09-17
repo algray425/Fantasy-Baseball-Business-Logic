@@ -34,7 +34,7 @@ fun Application.configureRouting(
             call.respond(ScheduleHandler.getUpcomingSchedule(team, startDate, endDate))
         }
 
-        get("/v2/stat/batting/{id}/{period}/{startDate}")
+        get("/stat/batting/{id}/{period}/{startDate}")
         {
             val id          = call.parameters["id"          ].toString()
             val period      = call.parameters["period"      ].toString()
@@ -65,7 +65,7 @@ fun Application.configureRouting(
             }
         }
 
-        get("/v2/stat/pitching/{id}/{period}/{startDate}")
+        get("/stat/pitching/{id}/{period}/{startDate}")
         {
             val id          = call.parameters["id"          ].toString()
             val period      = call.parameters["period"      ].toString()
