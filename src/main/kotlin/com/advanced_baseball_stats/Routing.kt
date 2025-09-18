@@ -18,6 +18,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting(
         battingStatHandler  : BattingStatHandler
     ,   pitchingStatHandler : PitchingStatHandler
+    ,   gradeHandler        : GradeHandler
 ){
     routing {
         get("/")
@@ -138,7 +139,7 @@ fun Application.configureRouting(
 
             try
             {
-                val playerGrades = GradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, stats)
+                val playerGrades = gradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, stats)
 
                 call.respond(playerGrades)
             }
@@ -166,7 +167,7 @@ fun Application.configureRouting(
 
             try
             {
-                val playerGrades = GradeHandler.getBattingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable)
+                val playerGrades = gradeHandler.getBattingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable)
 
                 call.respond(playerGrades)
             }
@@ -194,7 +195,7 @@ fun Application.configureRouting(
 
             try
             {
-                val playerGrades = GradeHandler.getPitchingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable)
+                val playerGrades = gradeHandler.getPitchingGradesByPercentile(stat, period, percentileStart, weekNumber, season, showAvailable)
 
                 call.respond(playerGrades)
             }

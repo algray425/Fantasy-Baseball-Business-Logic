@@ -8,17 +8,12 @@ import com.advanced_baseball_stats.model.grades.PitchingGradeStat
 import com.advanced_baseball_stats.utility.converter.BattingStatConverter
 import com.advanced_baseball_stats.utility.converter.PeriodConverter
 
-object GradeHandler
+class GradeHandler(
+        private val perGamePercentileGradesHandler  : PerGamePercentileGradesHandler
+    ,   private val aggregatePercentileGradesHandler: AggregatePercentileGradesHandler
+    ,   private val aggregatePlayerGradesHandler    : AggregatePlayerGradesHandler
+)
 {
-    private val periodToPlayerGradeHandler: Map<Period, PlayerGradesHandler> = mapOf(
-        Period.AGGREGATE to AggregatePlayerGradesHandler()
-    )
-
-    private val periodToPercentileGradeHandler: Map<Period, PercentileGradesHandler> = mapOf(
-        Period.AGGREGATE    to AggregatePercentileGradesHandler (),
-        Period.PER_GAME     to PerGamePercentileGradesHandler   ()
-    )
-
     fun getGradesByPlayer(id: String, period: String, startWeekNumber: String, endWeekNumber: String, stats: List<String>): MutableList<HolisticBattingGrade>
     {
         val convertedPeriod = PeriodConverter.convertPeriod(period)
@@ -54,9 +49,14 @@ object GradeHandler
             return mutableListOf()
         }
 
-        val handler = periodToPlayerGradeHandler[convertedPeriod]
-
-        return handler?.getGrades(id, convertedPeriod, convertedStartWeekNumber, convertedEndWeekNumber, battingStats) ?: mutableListOf()
+        if (Period.AGGREGATE.equals(convertedPeriod))
+        {
+            return aggregatePlayerGradesHandler.getGrades(id, convertedPeriod, convertedStartWeekNumber, convertedEndWeekNumber, battingStats)
+        }
+        else
+        {
+            return mutableListOf()
+        }
     }
 
     fun getBattingGradesByPercentile(stat: String, period: String, percentileStart: String, weekNumber: String, season: String, showAvailable: String): MutableList<HolisticGrade>
@@ -69,9 +69,14 @@ object GradeHandler
         val convertedSeason             = season            .toInt      ()
         val convertedShowAvailable      = showAvailable     .toBoolean  ()
 
-        val handler = periodToPercentileGradeHandler[convertedPeriod]
-
-        return handler?.getGrades(battingStat, convertedPercentileStart, convertedWeekNumber, convertedSeason, convertedShowAvailable) ?: mutableListOf()
+        if (Period.PER_GAME.equals(convertedPeriod))
+        {
+            return perGamePercentileGradesHandler.getGrades(battingStat, convertedPercentileStart, convertedWeekNumber, convertedSeason, convertedShowAvailable)
+        }
+        else
+        {
+            return aggregatePercentileGradesHandler.getGrades(battingStat, convertedPercentileStart, convertedWeekNumber, convertedSeason, convertedShowAvailable)
+        }
     }
 
     fun getPitchingGradesByPercentile(stat: String, period: String, percentileStart: String, weekNumber: String, season: String, showAvailable: String): MutableList<HolisticGrade>
@@ -84,8 +89,13 @@ object GradeHandler
         val convertedSeason             = season            .toInt      ()
         val convertedShowAvailable      = showAvailable     .toBoolean  ()
 
-        val handler = periodToPercentileGradeHandler[convertedPeriod]
-
-        return handler?.getGrades(pitchingStat, convertedPercentileStart, convertedWeekNumber, convertedSeason, convertedShowAvailable) ?: mutableListOf()
+        if (Period.PER_GAME.equals(convertedPeriod))
+        {
+            return perGamePercentileGradesHandler.getGrades(pitchingStat, convertedPercentileStart, convertedWeekNumber, convertedSeason, convertedShowAvailable)
+        }
+        else
+        {
+            return aggregatePercentileGradesHandler.getGrades(pitchingStat, convertedPercentileStart, convertedWeekNumber, convertedSeason, convertedShowAvailable)
+        }
     }
 }
