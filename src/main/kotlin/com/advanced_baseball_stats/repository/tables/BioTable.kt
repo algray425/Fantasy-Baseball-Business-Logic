@@ -39,4 +39,7 @@ object BioTable : Table<Nothing>("bios")
     val nameChange      = varchar   ("NAME_CHG"         )
     val batChange       = varchar   ("BAT_CHG"          )
     val hallOfFame      = varchar   ("HOF"              )
+    val team            = varchar   ("CURRENT_TEAM"     )
+    val position        = varchar   ("CURRENT_POSITION" )
+    val status          = varchar   ("CURRENT_STATUS"   )
 }

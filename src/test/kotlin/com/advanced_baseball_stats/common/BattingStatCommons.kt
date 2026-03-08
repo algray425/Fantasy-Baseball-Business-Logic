@@ -1,7 +1,7 @@
 package com.advanced_baseball_stats.common
 
 import com.advanced_baseball_stats.model.batting.BattingGame
-import com.advanced_baseball_stats.model.batting.BattingGameStat
+import com.advanced_baseball_stats.model.batting.GameStat
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.batting.HolisticBattingStatList
 import com.advanced_baseball_stats.model.common.Team
@@ -36,8 +36,8 @@ object BattingStatCommons
 
     val FIRST_GAME                                      = Game(FIRST_GID, TEMP, WIND_SPEED, WIND_DIRECTION, CONDITION, PRECIPITATION, TIME_OF_DAY, HOME_TEAM, AWAY_TEAM)
     val SECOND_GAME                                     = Game(SECOND_GID, TEMP, WIND_SPEED, WIND_DIRECTION, CONDITION, PRECIPITATION, TIME_OF_DAY, HOME_TEAM, AWAY_TEAM)
-    val FIRST_BATTING_GAME_STAT_HIT                     = BattingGameStat(STAT_NAME_HIT, FIRST_HIT_NUM)
-    val SECOND_BATTING_GAME_STAT_HIT                    = BattingGameStat(STAT_NAME_HIT, SECOND_HIT_NUM)
+    val FIRST_BATTING_GAME_STAT_HIT                     = GameStat(STAT_NAME_HIT, FIRST_HIT_NUM)
+    val SECOND_BATTING_GAME_STAT_HIT                    = GameStat(STAT_NAME_HIT, SECOND_HIT_NUM)
     val FIRST_BATTING_GAME_HIT                          = BattingGame(FIRST_GAME, mutableListOf(FIRST_BATTING_GAME_STAT_HIT))
     val SECOND_BATTING_GAME_HIT                         = BattingGame(SECOND_GAME, mutableListOf(SECOND_BATTING_GAME_STAT_HIT))
     val HOLISTIC_BATTING_STAT_LIST_HIT                  = HolisticBattingStatList(ID, listOf(FIRST_BATTING_GAME_HIT))

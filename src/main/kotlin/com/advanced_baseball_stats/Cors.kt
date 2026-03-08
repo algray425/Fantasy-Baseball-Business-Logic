@@ -10,6 +10,8 @@ fun Application.configureCors()
     {
         allowHost("localhost:9393")
         allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Delete)
         allowHeader(HttpHeaders.ContentType)
         allowCredentials = true
     }

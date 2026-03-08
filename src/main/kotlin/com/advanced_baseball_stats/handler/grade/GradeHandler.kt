@@ -14,11 +14,13 @@ class GradeHandler(
     ,   private val aggregatePlayerGradesHandler    : AggregatePlayerGradesHandler
 )
 {
-    fun getGradesByPlayer(id: String, period: String, startWeekNumber: String, endWeekNumber: String, stats: List<String>): MutableList<HolisticBattingGrade>
+    fun getGradesByPlayer(id: String, period: String, startWeekNumber: String, endWeekNumber: String, season: String, stats: List<String>): MutableList<HolisticBattingGrade>
     {
         val convertedPeriod = PeriodConverter.convertPeriod(period)
 
         val convertedStartWeekNumber = startWeekNumber.toInt()
+
+        val convertedSeason = season.toInt()
 
         //TODO: Do all MLB seasons have the same number of weeks?... might be good to cross reference this with a year parameter
         val convertedEndWeekNumber = if (endWeekNumber.isEmpty()) 29 else endWeekNumber .toInt()
@@ -51,7 +53,7 @@ class GradeHandler(
 
         if (Period.AGGREGATE.equals(convertedPeriod))
         {
-            return aggregatePlayerGradesHandler.getGrades(id, convertedPeriod, convertedStartWeekNumber, convertedEndWeekNumber, battingStats)
+            return aggregatePlayerGradesHandler.getGrades(id, convertedPeriod, convertedStartWeekNumber, convertedEndWeekNumber, convertedSeason, battingStats)
         }
         else
         {

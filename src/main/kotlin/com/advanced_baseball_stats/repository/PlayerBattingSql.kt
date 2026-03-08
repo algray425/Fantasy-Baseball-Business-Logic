@@ -1,12 +1,14 @@
 package com.advanced_baseball_stats.repository
 
 import com.advanced_baseball_stats.model.batting.BattingGame
-import com.advanced_baseball_stats.model.batting.BattingGameStat
+import com.advanced_baseball_stats.model.batting.GameStat
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.batting.HolisticBattingStatList
 import com.advanced_baseball_stats.model.common.Team
 import com.advanced_baseball_stats.model.game.*
+import com.advanced_baseball_stats.model.player.MinimalPlayer
 import com.advanced_baseball_stats.repository.tables.BatterTable
+import com.advanced_baseball_stats.repository.tables.BioTable
 import com.advanced_baseball_stats.repository.tables.GameTable
 import org.ktorm.dsl.*
 import org.ktorm.schema.Column
@@ -108,6 +110,8 @@ object PlayerBattingSql
     private val gameColumns = listOf(GameTable.gid, GameTable.temp, GameTable.sky, GameTable.winddir, GameTable.windspeed, GameTable.precip,
         GameTable.daynight, GameTable.hometeam, GameTable.visteam, GameTable.site)
 
+    private val bioColumns = listOf(BioTable.team, BioTable.first, BioTable.last, BioTable.position, BioTable.status)
+
     fun getBattingStatsAggregate(id: String, startDate: String, endDate: String, statList: List<BattingStat>): HolisticBattingStatList
     {
         val battingGames = mutableListOf<BattingGame>()
@@ -133,15 +137,35 @@ object PlayerBattingSql
         }
 
         columnsToSelect.addAll(gameColumns)
+        columnsToSelect.addAll(bioColumns )
 
         val dateRanges: ClosedRange<String> = startDate..endDate
 
+        var batterTeam          = ""
+        var batterFirstName     = ""
+        var batterLastName      = ""
+        var batterPosition      = ""
+        var batterStatus        = ""
+
         DatabaseConnection.database.from(BatterTable)
             .innerJoin(GameTable, on = BatterTable.gid eq GameTable.gid)
+            .innerJoin(BioTable, on = BatterTable.id eq BioTable.playerId)
             .select(columnsToSelect)
             .where { (BatterTable.id eq id) and (BatterTable.date between dateRanges) }
             .orderBy(BatterTable.date.asc())
             .forEach { batterRow ->
+                val team        = batterRow[BioTable.team       ]
+                val first       = batterRow[BioTable.first      ]
+                val last        = batterRow[BioTable.last       ]
+                val position    = batterRow[BioTable.position   ]
+                val status      = batterRow[BioTable.status     ]
+
+                batterTeam      = team      ?: ""
+                batterFirstName = first     ?: ""
+                batterLastName  = last      ?: ""
+                batterPosition  = position  ?: ""
+                batterStatus    = status    ?: ""
+
                 val curGame = this.getGame(batterRow)
 
                 if (curGame != null)
@@ -154,14 +178,17 @@ object PlayerBattingSql
                     {
                         val num = battingStatToAggregateBattingExtractor[stat]?.invoke(batterRow, battingStatToSum, updated)!!
 
-                        val battingGameStat = BattingGameStat(stat, num)
+                        val gameStat = GameStat(stat, num)
 
-                        battingGame.stats.add(battingGameStat)
+                        battingGame.stats.add(gameStat)
                     }
                     battingGames.add(battingGame)
                 }
             }
-        return HolisticBattingStatList(id, battingGames)
+
+        val playerInfo = MinimalPlayer(id, batterFirstName, batterLastName, batterTeam, batterPosition, batterStatus)
+
+        return HolisticBattingStatList(playerInfo, battingGames)
     }
 
     private fun extractBattingStatAggregateFromRow(row: QueryRowSet, battingStat: BattingStat, battingStatToSum: MutableMap<BattingStat, Double>, updated: MutableMap<BattingStat, Boolean>): Double
@@ -335,12 +362,30 @@ object PlayerBattingSql
 
         val dateRanges: ClosedRange<String> = startDate..endDate
 
+        var batterTeam      = ""
+        var batterFirstName = ""
+        var batterLastName  = ""
+        var batterPosition  = ""
+        var batterStatus    = ""
+
         DatabaseConnection.database.from(BatterTable)
             .innerJoin(GameTable, on = BatterTable.gid eq GameTable.gid)
             .select(columnsToSelect)
             .where { (BatterTable.id eq id) and (BatterTable.date between dateRanges) }
             .orderBy(BatterTable.date.asc())
             .forEach { batterRow ->
+                val team        = batterRow[BioTable.team       ]
+                val first       = batterRow[BioTable.first      ]
+                val last        = batterRow[BioTable.last       ]
+                val position    = batterRow[BioTable.position   ]
+                val status      = batterRow[BioTable.status     ]
+
+                batterTeam      = team      ?: ""
+                batterFirstName = first     ?: ""
+                batterLastName  = last      ?: ""
+                batterPosition  = position  ?: ""
+                batterStatus    = status    ?: ""
+
                 val curGame = this.getGame(batterRow)
 
                 if (curGame != null)
@@ -351,14 +396,17 @@ object PlayerBattingSql
                     {
                         val num = battingStatToPerGameBattingExtractor[stat]?.invoke(batterRow)!!
 
-                        val battingGameStat = BattingGameStat(stat, num)
+                        val gameStat = GameStat(stat, num)
 
-                        battingGame.stats.add(battingGameStat)
+                        battingGame.stats.add(gameStat)
                     }
                     battingGames.add(battingGame)
                 }
             }
-        return HolisticBattingStatList(id, battingGames)
+
+        val playerInfo = MinimalPlayer(id, batterFirstName, batterLastName, batterTeam, batterPosition, batterStatus)
+
+        return HolisticBattingStatList(playerInfo, battingGames)
     }
 
     private fun extractBattingStatPerGameFromRow(row: QueryRowSet, stat: BattingStat): Double

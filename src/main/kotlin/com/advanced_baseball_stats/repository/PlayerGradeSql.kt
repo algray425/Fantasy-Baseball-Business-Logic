@@ -2,23 +2,24 @@ package com.advanced_baseball_stats.repository
 
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.grades.*
-import com.advanced_baseball_stats.repository.tables.AggregateWeeklyGradesTable
-import com.advanced_baseball_stats.repository.tables.FantasyRostersTable
-import com.advanced_baseball_stats.repository.tables.WeeklyGradesTable
+import com.advanced_baseball_stats.model.player.MinimalPlayer
+import com.advanced_baseball_stats.repository.tables.*
+import com.advanced_baseball_stats.utility.converter.BattingStatConverter
 import org.ktorm.dsl.*
 import java.math.RoundingMode
 
 object PlayerGradeSql
 {
-    fun getAggregatePlayerGrades(id: String, startWeek: Int, endWeek: Int, stats: List<BattingStat>): MutableList<HolisticBattingGrade>
+    fun getAggregatePlayerGrades(id: String, startWeek: Int, endWeek: Int, season: Int, stats: List<BattingStat>): MutableList<HolisticBattingGrade>
     {
         val grades: MutableList<HolisticBattingGrade> = mutableListOf()
 
         val weekNumberRanges: ClosedRange<Int>  = startWeek..endWeek
 
         DatabaseConnection.database.from(AggregateWeeklyGradesTable)
-            .select(AggregateWeeklyGradesTable.playerId, AggregateWeeklyGradesTable.weekNumber, AggregateWeeklyGradesTable.stat, AggregateWeeklyGradesTable.aggregate_num, AggregateWeeklyGradesTable.percentile)
-            .where { (AggregateWeeklyGradesTable.playerId eq id) and (AggregateWeeklyGradesTable.weekNumber between weekNumberRanges) }
+            .innerJoin(BioTable, on = AggregateWeeklyGradesTable.playerId eq BioTable.playerId)
+            .select(AggregateWeeklyGradesTable.playerId, AggregateWeeklyGradesTable.weekNumber, AggregateWeeklyGradesTable.stat, AggregateWeeklyGradesTable.aggregate_num, AggregateWeeklyGradesTable.percentile, BioTable.team, BioTable.first, BioTable.last, BioTable.position, BioTable.status)
+            .where { (AggregateWeeklyGradesTable.playerId eq id) and (AggregateWeeklyGradesTable.weekNumber between weekNumberRanges) and (AggregateWeeklyGradesTable.season eq season) }
 //            .whereWithOrConditions {
 //                for (stat in stats)
 //                {
@@ -38,7 +39,15 @@ object PlayerGradeSql
                 val convertedNum            = num       .toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
                 val convertedPercentile     = percentile.toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
 
-                val curGrade = HolisticBattingGrade(playerId, weekNumber, convertedStat, convertedNum, convertedPercentile)
+                val playerTeam      = grade[BioTable.team       ] ?: ""
+                val playerFirstName = grade[BioTable.first      ] ?: ""
+                val playerLastName  = grade[BioTable.last       ] ?: ""
+                val playerPosition  = grade[BioTable.position   ] ?: ""
+                val playerStatus    = grade[BioTable.status     ] ?: ""
+
+                val player = MinimalPlayer(playerId, playerFirstName, playerLastName, playerTeam, playerPosition, playerStatus)
+
+                val curGrade = HolisticBattingGrade(player, weekNumber, convertedStat, convertedNum, convertedPercentile)
 
                 grades.add(curGrade)
             }
@@ -65,7 +74,8 @@ object PlayerGradeSql
         val grades: MutableList<HolisticGrade> = mutableListOf()
 
         DatabaseConnection.database.from(WeeklyGradesTable)
-            .select(WeeklyGradesTable.playerId, WeeklyGradesTable.weekNumber, WeeklyGradesTable.stat, WeeklyGradesTable.num, WeeklyGradesTable.percentile)
+            .innerJoin(BioTable, on = AggregateWeeklyGradesTable.playerId eq BioTable.playerId)
+            .select(WeeklyGradesTable.playerId, WeeklyGradesTable.weekNumber, WeeklyGradesTable.stat, WeeklyGradesTable.num, WeeklyGradesTable.percentile, BioTable.team, BioTable.first, BioTable.last, BioTable.position, BioTable.status)
             .where { (WeeklyGradesTable.stat eq stat) and (WeeklyGradesTable.percentile greaterEq percentileStart) and (WeeklyGradesTable.weekNumber eq weekNumber) and (WeeklyGradesTable.season eq season) }
             .orderBy(WeeklyGradesTable.percentile.desc())
             .forEach { grade ->
@@ -78,11 +88,19 @@ object PlayerGradeSql
                 val convertedNum            = num       .toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
                 val convertedPercentile     = percentile.toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
 
+                val playerTeam      = grade[BioTable.team       ] ?: ""
+                val playerFirstName = grade[BioTable.first      ] ?: ""
+                val playerLastName  = grade[BioTable.last       ] ?: ""
+                val playerPosition  = grade[BioTable.position   ] ?: ""
+                val playerStatus    = grade[BioTable.status     ] ?: ""
+
+                val player = MinimalPlayer(playerId, playerFirstName, playerLastName, playerTeam, playerPosition, playerStatus)
+
                 if (batting)
                 {
                     val convertedStat = BattingStat.valueOf(rowStat)
 
-                    val curGrade = HolisticBattingGrade(playerId, weekNum, convertedStat, convertedNum, convertedPercentile)
+                    val curGrade = HolisticBattingGrade(player, weekNum, convertedStat, convertedNum, convertedPercentile)
 
                     grades.add(curGrade)
                 }
@@ -90,7 +108,7 @@ object PlayerGradeSql
                 {
                     val convertedStat = PitchingGradeStat.valueOf(rowStat)
 
-                    val curGrade = HolisticPitchingGrade(playerId, weekNum, convertedStat, convertedNum, convertedPercentile)
+                    val curGrade = HolisticPitchingGrade(player, weekNum, convertedStat, convertedNum, convertedPercentile)
 
                     grades.add(curGrade)
                 }
@@ -106,7 +124,8 @@ object PlayerGradeSql
         val rosteredPlayers = getRosteredPlayers()
 
         DatabaseConnection.database.from(WeeklyGradesTable)
-            .select(WeeklyGradesTable.playerId, WeeklyGradesTable.stat, WeeklyGradesTable.num, WeeklyGradesTable.percentile)
+            .innerJoin(BioTable, on = AggregateWeeklyGradesTable.playerId eq BioTable.playerId)
+            .select(WeeklyGradesTable.playerId, WeeklyGradesTable.stat, WeeklyGradesTable.num, WeeklyGradesTable.percentile, BioTable.team, BioTable.first, BioTable.last, BioTable.position, BioTable.status)
             .whereWithConditions {
                 it += WeeklyGradesTable.stat        eq          stat
                 it += WeeklyGradesTable.percentile  greaterEq   percentileStart
@@ -128,20 +147,26 @@ object PlayerGradeSql
                 val convertedNum            = num       .toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
                 val convertedPercentile     = percentile.toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
 
+                val playerTeam      = grade[BioTable.team       ] ?: ""
+                val playerFirstName = grade[BioTable.first      ] ?: ""
+                val playerLastName  = grade[BioTable.last       ] ?: ""
+                val playerPosition  = grade[BioTable.position   ] ?: ""
+                val playerStatus    = grade[BioTable.status     ] ?: ""
+
+                val player = MinimalPlayer(retroPlayerId, playerFirstName, playerLastName, playerTeam, playerPosition, playerStatus)
+
                 if (isBatting)
                 {
-                    val curGrade = HolisticBattingGrade(retroPlayerId, weekNumber, BattingStat.valueOf(rowStat), convertedNum, convertedPercentile)
+                    val curGrade = HolisticBattingGrade(player, weekNumber, BattingStat.valueOf(rowStat), convertedNum, convertedPercentile)
 
                     grades.add(curGrade)
                 }
                 else
                 {
-                    val curGrade = HolisticPitchingStat(retroPlayerId, weekNumber, PitchingGradeStat.valueOf(rowStat), convertedNum, convertedPercentile)
+                    val curGrade = HolisticPitchingGrade(player, weekNumber, PitchingGradeStat.valueOf(rowStat), convertedNum, convertedPercentile)
 
                     grades.add(curGrade)
                 }
-
-
             }
 
         return grades
@@ -322,13 +347,14 @@ object PlayerGradeSql
         return rosteredPlayers
     }
 
-    fun getAggregatePercentileGrades(stat: BattingStat, percentileStart: Float, weekNumber: Int): MutableList<HolisticGrade>
+    fun getAggregatePercentileGradesBatting(stat: BattingStat, percentileStart: Float, weekNumber: Int, season: Int): MutableList<HolisticGrade>
     {
         val grades: MutableList<HolisticGrade> = mutableListOf()
 
         DatabaseConnection.database.from(AggregateWeeklyGradesTable)
-            .select(AggregateWeeklyGradesTable.playerId, AggregateWeeklyGradesTable.weekNumber, AggregateWeeklyGradesTable.stat, AggregateWeeklyGradesTable.aggregate_num, AggregateWeeklyGradesTable.percentile)
-            .where { (AggregateWeeklyGradesTable.stat eq stat.toString()) and (AggregateWeeklyGradesTable.percentile greaterEq percentileStart) and (AggregateWeeklyGradesTable.weekNumber eq weekNumber) }
+            .innerJoin(BioTable, on = AggregateWeeklyGradesTable.playerId eq BioTable.playerId)
+            .select(AggregateWeeklyGradesTable.playerId, AggregateWeeklyGradesTable.weekNumber, AggregateWeeklyGradesTable.stat, AggregateWeeklyGradesTable.aggregate_num, AggregateWeeklyGradesTable.percentile, BioTable.team, BioTable.first, BioTable.last, BioTable.position, BioTable.status)
+            .where { (AggregateWeeklyGradesTable.stat eq stat.toString()) and (AggregateWeeklyGradesTable.percentile greaterEq percentileStart) and (AggregateWeeklyGradesTable.weekNumber eq weekNumber) and (AggregateWeeklyGradesTable.season eq season) }
             .orderBy(AggregateWeeklyGradesTable.percentile.desc())
             .forEach { grade ->
                 val playerId    = grade[AggregateWeeklyGradesTable.playerId     ]!!
@@ -337,12 +363,57 @@ object PlayerGradeSql
                 val num         = grade[AggregateWeeklyGradesTable.aggregate_num]!!
                 val percentile  = grade[AggregateWeeklyGradesTable.percentile   ]!!
 
-                val convertedStat = BattingStat.valueOf(battingStat)
+                val convertedNum            = num       .toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
+                val convertedPercentile     = percentile.toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
+
+                val playerTeam      = grade[BioTable.team       ] ?: ""
+                val playerFirstName = grade[BioTable.first      ] ?: ""
+                val playerLastName  = grade[BioTable.last       ] ?: ""
+                val playerPosition  = grade[BioTable.position   ] ?: ""
+                val playerStatus    = grade[BioTable.status     ] ?: ""
+
+                val player = MinimalPlayer(playerId, playerFirstName, playerLastName, playerTeam, playerPosition, playerStatus)
+
+                val convertedStat =  BattingStatConverter.convertBattingStat(battingStat)
+
+                val curGrade = HolisticBattingGrade(player, weekNum, convertedStat, convertedNum, convertedPercentile)
+
+                grades.add(curGrade)
+            }
+
+        return grades
+    }
+
+    fun getAggregatePercentileGradesPitching(stat: PitchingGradeStat, percentileStart: Float, weekNumber: Int, season: Int): MutableList<HolisticGrade>
+    {
+        val grades: MutableList<HolisticGrade> = mutableListOf()
+
+        DatabaseConnection.database.from(AggregateWeeklyGradesTable)
+            .innerJoin(BioTable, on = AggregateWeeklyGradesTable.playerId eq BioTable.playerId)
+            .select(AggregateWeeklyGradesTable.playerId, AggregateWeeklyGradesTable.weekNumber, AggregateWeeklyGradesTable.stat, AggregateWeeklyGradesTable.aggregate_num, AggregateWeeklyGradesTable.percentile, BioTable.team, BioTable.first, BioTable.last, BioTable.position, BioTable.status)
+            .where { (AggregateWeeklyGradesTable.stat eq stat.toString()) and (AggregateWeeklyGradesTable.percentile greaterEq percentileStart) and (AggregateWeeklyGradesTable.weekNumber eq weekNumber) and (AggregateWeeklyGradesTable.season eq season) }
+            .orderBy(AggregateWeeklyGradesTable.percentile.desc())
+            .forEach { grade ->
+                val playerId    = grade[AggregateWeeklyGradesTable.playerId     ]!!
+                val weekNum     = grade[AggregateWeeklyGradesTable.weekNumber   ]!!
+                val battingStat = grade[AggregateWeeklyGradesTable.stat         ]!!
+                val num         = grade[AggregateWeeklyGradesTable.aggregate_num]!!
+                val percentile  = grade[AggregateWeeklyGradesTable.percentile   ]!!
 
                 val convertedNum            = num       .toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
                 val convertedPercentile     = percentile.toBigDecimal().setScale(3, RoundingMode.UP).toDouble()
 
-                val curGrade = HolisticBattingGrade(playerId, weekNum, convertedStat, convertedNum, convertedPercentile)
+                val playerTeam      = grade[BioTable.team       ] ?: ""
+                val playerFirstName = grade[BioTable.first      ] ?: ""
+                val playerLastName  = grade[BioTable.last       ] ?: ""
+                val playerPosition  = grade[BioTable.position   ] ?: ""
+                val playerStatus    = grade[BioTable.status     ] ?: ""
+
+                val player = MinimalPlayer(playerId, playerFirstName, playerLastName, playerTeam, playerPosition, playerStatus)
+
+                val convertedStat =  PitchingGradeStat.valueOf(battingStat)
+
+                val curGrade = HolisticPitchingGrade(player, weekNum, convertedStat, convertedNum, convertedPercentile)
 
                 grades.add(curGrade)
             }

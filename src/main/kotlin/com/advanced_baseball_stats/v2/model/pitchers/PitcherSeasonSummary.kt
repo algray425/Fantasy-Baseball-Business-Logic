@@ -1,0 +1,51 @@
+package com.advanced_baseball_stats.v2.model.pitchers
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+class PitcherSeasonSummary(
+    val season: Int,
+    val teams: String,
+    val ipOuts: Int,
+    val battersFaced: Int,
+    val hits: Int,
+    val homeRuns: Int,
+    val runs: Int,
+    val earnedRuns: Int,
+    val walks: Int,
+    val intentionalWalks: Int,
+    val strikeOuts: Int,
+    val hitByPitch: Int,
+    val wildPitches: Int,
+    val balks: Int,
+    val stolenBases: Int,
+    val caughtStealing: Int,
+    val passedBalls: Int,
+    val wins: Int,
+    val losses: Int,
+    val saves: Int,
+    val holds: Int,
+    val qualityStarts: Int,
+    val gamesStarted: Int,
+    val era: Double,
+    val whip: Double,
+    val ksPerNine: Double,
+    val walksPerNine: Double,
+    val homeRunsPerNine: Double,
+    val averageFastballVelocity: Double,
+    val averageExitVelocity: Double,
+    val zonePercentage: Double,
+    val chasePercentage: Double,
+    val swingingStrikePercentage: Double,
+    val hardHitPercentage: Double,
+    val barrelPercentage: Double,
+    val groundBallPercentage: Double,
+    val flyBallPercentage: Double,
+    val lineDrivePercentage: Double,
+    val popUpPercentage: Double,
+    val strikeOutPercentage: Double,
+    val walkPercentage: Double,
+    val strikeOutWalkDifference: Double,
+    val homeRunPerFlyBallPercentage: Double
+) {
+}

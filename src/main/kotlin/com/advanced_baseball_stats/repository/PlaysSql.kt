@@ -1,11 +1,12 @@
 package com.advanced_baseball_stats.repository
 
 import com.advanced_baseball_stats.model.batting.BattingGame
-import com.advanced_baseball_stats.model.batting.BattingGameStat
+import com.advanced_baseball_stats.model.batting.GameStat
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.batting.HolisticBattingStatList
 import com.advanced_baseball_stats.model.common.Team
 import com.advanced_baseball_stats.model.game.*
+import com.advanced_baseball_stats.model.player.MinimalPlayer
 import com.advanced_baseball_stats.repository.tables.GameTable
 import com.advanced_baseball_stats.repository.tables.PlayTable
 import org.ktorm.dsl.*
@@ -58,9 +59,9 @@ object PlaysSql
     private val gameColumns = listOf(GameTable.gid, GameTable.temp, GameTable.sky, GameTable.winddir, GameTable.windspeed, GameTable.precip,
         GameTable.daynight, GameTable.hometeam, GameTable.visteam, GameTable.site)
 
-    fun getBattingStatsTotalByPitcher(batterId: String, pitcherId: String, pitcherHandedness: String, startDate: String, endDate: String, statList: List<BattingStat>): List<BattingGameStat>
+    fun getBattingStatsTotalByPitcher(batterId: String, pitcherId: String, pitcherHandedness: String, startDate: String, endDate: String, statList: List<BattingStat>): List<GameStat>
     {
-        val battingStats = mutableListOf<BattingGameStat>()
+        val battingStats = mutableListOf<GameStat>()
 
         val columnsToSelect = mutableListOf<ColumnDeclaring<*>>()
 
@@ -96,9 +97,9 @@ object PlaysSql
                 {
                     val num = battingStatToPerGameBattingExtractor[stat]?.invoke(play)!!
 
-                    val battingGameStat = BattingGameStat(stat, num)
+                    val gameStat = GameStat(stat, num)
 
-                    battingStats.add(battingGameStat)
+                    battingStats.add(gameStat)
                 }
             }
         return battingStats
@@ -153,14 +154,17 @@ object PlaysSql
                     {
                         val num = battingStatToPerGameBattingExtractor[stat]?.invoke(play)!!
 
-                        val battingGameStat = BattingGameStat(stat, num)
+                        val gameStat = GameStat(stat, num)
 
-                        battingGame.stats.add(battingGameStat)
+                        battingGame.stats.add(gameStat)
                     }
                     battingGames.add(battingGame)
                 }
             }
-        return HolisticBattingStatList(batterId, battingGames)
+
+        val playerInfo = MinimalPlayer(batterId, "", "", "", "", "")
+
+        return HolisticBattingStatList(playerInfo, battingGames)
     }
 
     private fun extractBattingStatPerGameFromRow(row: QueryRowSet, stat: BattingStat): Double

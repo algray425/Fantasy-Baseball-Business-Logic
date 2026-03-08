@@ -11,12 +11,11 @@ class AggregatePercentileGradesHandler : PercentileGradesHandler
 {
     override fun getGrades(stat: BattingStat, percentileStart: Float, weekNumber: Int, season: Int, showAvailable: Boolean): MutableList<HolisticGrade>
     {
-        return PlayerGradeSql.getAggregatePercentileGrades(stat, percentileStart, weekNumber)
+        return PlayerGradeSql.getAggregatePercentileGradesBatting(stat, percentileStart, weekNumber, season)
     }
 
     override fun getGrades(stat: PitchingGradeStat, percentileStart: Float, weekNumber: Int, season: Int, showAvailable: Boolean): MutableList<HolisticGrade>
     {
-        //TODO
-        return mutableListOf()
+        return PlayerGradeSql.getAggregatePercentileGradesPitching(stat, percentileStart, weekNumber, season)
     }
 }

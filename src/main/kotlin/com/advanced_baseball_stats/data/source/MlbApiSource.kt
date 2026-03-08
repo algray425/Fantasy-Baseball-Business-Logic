@@ -4,7 +4,6 @@ import com.advanced_baseball_stats.model.MlbApi.Schedule
 import com.advanced_baseball_stats.model.common.Team
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 
 class MlbApiSource
 {

@@ -1,13 +1,13 @@
 package com.advanced_baseball_stats.handler.batting
 
-import com.advanced_baseball_stats.model.batting.BattingGameStat
+import com.advanced_baseball_stats.model.batting.GameStat
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.repository.PlaysSql
 import com.advanced_baseball_stats.utility.converter.date.DateHelper
 
 class TotalBattingStatHandler
 {
-    fun getStats(id: String, pitcherId: String, pitcherHandedness: String, startDate: String, endDate: String, statList: List<BattingStat>): List<BattingGameStat>
+    fun getStats(id: String, pitcherId: String, pitcherHandedness: String, startDate: String, endDate: String, statList: List<BattingStat>): List<GameStat>
     {
         val finalEndDate = if (endDate.isEmpty()) DateHelper.getCurrentDate() else endDate
 

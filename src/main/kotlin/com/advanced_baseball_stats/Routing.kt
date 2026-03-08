@@ -9,6 +9,10 @@ import com.advanced_baseball_stats.handler.math.MathStatHandler
 import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
 import com.advanced_baseball_stats.handler.player.PlayerStatHandler
 import com.advanced_baseball_stats.handler.schedule.ScheduleHandler
+import com.advanced_baseball_stats.v2.handler.FantasyTeamsHandler
+import com.advanced_baseball_stats.v2.handler.FavoritePlayersHandler
+import com.advanced_baseball_stats.v2.handler.PlayerStatsHandler
+import com.advanced_baseball_stats.v2.model.batters.FavoritePlayers.FavoritePlayerInfo
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -16,14 +20,204 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(
-        battingStatHandler  : BattingStatHandler
-    ,   pitchingStatHandler : PitchingStatHandler
-    ,   gradeHandler        : GradeHandler
+        battingStatHandler      : BattingStatHandler
+    ,   pitchingStatHandler     : PitchingStatHandler
+    ,   gradeHandler            : GradeHandler
+    ,   playerStatsHandler      : PlayerStatsHandler
+    ,   favoritePlayersHandler  : FavoritePlayersHandler
+    ,   fantasyTeamsHandler     : FantasyTeamsHandler
 ){
     routing {
         get("/")
         {
             call.respond("Hello World!")
+        }
+
+        get("/api/v2/players/hitting/stats/{season}")
+        {
+            val season: Int = call.parameters["season"]?.toInt() ?: 0
+
+            val queryParameters = call.queryParameters
+
+            val sortBy              = queryParameters["sortBy"          ] ?: "PERCENTILE_OVERALL"
+            val position            = queryParameters["position"        ] ?: ""
+            val startDate           = queryParameters["startDate"       ] ?: ""
+            val endDate             = queryParameters["endDate"         ] ?: ""
+            val leagueTypeFilter    = queryParameters["leagueTypeFilter"] ?: ""
+            val leagueIdFilter      = queryParameters["leagueIdFilter"  ] ?: ""
+            val limit               = queryParameters["limit"           ]?.toInt()  ?: 10
+            val page                = queryParameters["page"            ]?.toInt()  ?: 0
+
+            call.respond(playerStatsHandler.getRankedHittersBySeason(season, sortBy, position, startDate, endDate, leagueTypeFilter, leagueIdFilter, limit, page))
+        }
+
+        get("/api/v2/players/startingPitchers/stats/{season}")
+        {
+            val season: Int = call.parameters["season"]?.toInt() ?: 0
+
+            val queryParameters = call.queryParameters
+
+            val sortBy              = queryParameters["sortBy"          ] ?: "PERCENTILE_OVERALL"
+            val startDate           = queryParameters["startDate"       ] ?: ""
+            val endDate             = queryParameters["endDate"         ] ?: ""
+            val leagueTypeFilter    = queryParameters["leagueTypeFilter"] ?: ""
+            val leagueIdFilter      = queryParameters["leagueIdFilter"  ] ?: ""
+            val limit               = queryParameters["limit"           ]?.toInt()  ?: 10
+            val page                = queryParameters["page"            ]?.toInt()  ?: 0
+
+            call.respond(playerStatsHandler.getRankedStartingPitchersBySeason(season, sortBy, startDate, endDate, leagueTypeFilter, leagueIdFilter, limit, page))
+        }
+
+        get("/api/v2/players/reliefPitchers/stats/{season}")
+        {
+            val season: Int = call.parameters["season"]?.toInt() ?: 0
+
+            val queryParameters = call.queryParameters
+
+            val sortBy              = queryParameters["sortBy"          ] ?: "PERCENTILE_OVERALL"
+            val startDate           = queryParameters["startDate"       ] ?: ""
+            val endDate             = queryParameters["endDate"         ] ?: ""
+            val leagueTypeFilter    = queryParameters["leagueTypeFilter"] ?: ""
+            val leagueIdFilter      = queryParameters["leagueIdFilter"  ] ?: ""
+            val limit               = queryParameters["limit"           ]?.toInt()  ?: 10
+            val page                = queryParameters["page"            ]?.toInt()  ?: 0
+
+            call.respond(playerStatsHandler.getRankedReliefPitchersBySeason(season, sortBy, startDate, endDate, leagueTypeFilter, leagueIdFilter, limit, page))
+        }
+
+        get("/api/v2/players/hitting/projections")
+        {
+            val queryParameters = call.queryParameters
+
+            val sortBy              = queryParameters["sortBy"      ]              ?: "PERCENTILE_OVERALL"
+            val qualified           = queryParameters["qualified"   ]?.toBoolean() ?: false
+            val position            = queryParameters["position"    ]              ?: ""
+            val leagueTypeFilter    = queryParameters["leagueType"  ]              ?: ""
+            val leagueIdFilter      = queryParameters["leagueId"    ]              ?: ""
+            val limit               = queryParameters["limit"       ]?.toInt()     ?: 10
+            val page                = queryParameters["page"        ]?.toInt()     ?: 0
+
+            call.respond(playerStatsHandler.getBatterProjections(sortBy, qualified, position, leagueTypeFilter, leagueIdFilter, limit, page))
+        }
+
+        get("/api/v2/players/hitting/summary/{playerId}")
+        {
+            val playerId: String = call.parameters["playerId"].toString()
+
+            val playerSummary = playerStatsHandler.getHitterSummary(playerId)
+
+            if (playerSummary == null)
+            {
+                call.respond(HttpStatusCode.BadRequest, "invalid playerId!")
+            }
+            else
+            {
+                call.respond(playerSummary)
+            }
+        }
+
+        get("/api/v2/players/pitching/summary/{playerId}")
+        {
+            val playerId: String = call.parameters["playerId"].toString()
+
+            val playerSummary = playerStatsHandler.getPitcherSummary(playerId)
+
+            if (playerSummary == null)
+            {
+                call.respond(HttpStatusCode.BadRequest, "invalid playerId!")
+            }
+            else
+            {
+                call.respond(playerSummary)
+            }
+        }
+
+        get("/api/v2/players/hitting/stats/seasonSummaries/{playerId}")
+        {
+            val playerId: String = call.parameters["playerId"].toString()
+
+            val queryParameters = call.queryParameters
+
+            val startSeason = queryParameters["startSeason"] ?: "2025"
+
+
+            call.respond(playerStatsHandler.getHitterSeasonSummaries(playerId, startSeason))
+        }
+
+        get("/api/v2/players/pitching/stats/seasonSummaries/{playerId}")
+        {
+            val playerId: String = call.parameters["playerId"].toString()
+
+            val queryParameters = call.queryParameters
+
+            val startSeason = queryParameters["startSeason"] ?: "2025"
+
+            call.respond(playerStatsHandler.getPitcherSeasonSummaries(playerId, startSeason))
+        }
+
+        get("/api/v2/players/hitting/stats/perGame/{playerId}/{season}/{stat}")
+        {
+            val playerId: String    = call.parameters["playerId"].toString()
+            val season  : Int       = call.parameters["season"  ]?.toInt() ?: -1
+            val stat    : String    = call.parameters["stat"    ].toString()
+
+            call.respond(playerStatsHandler.getHittingStatPerGame(playerId, season, stat))
+        }
+
+        get("/api/v2/players/pitching/stats/perGame/{playerId}/{season}/{stat}")
+        {
+            val playerId: String    = call.parameters["playerId"].toString()
+            val season  : Int       = call.parameters["season"  ]?.toInt() ?: -1
+            val stat    : String    = call.parameters["stat"    ].toString()
+
+            call.respond(playerStatsHandler.getPitchingStatPerGame(playerId, season, stat))
+        }
+
+        get("/api/v2/users/getFavoritePlayers/{userId}")
+        {
+            val userId: String = call.parameters["userId"].toString()
+
+            call.respond(favoritePlayersHandler.getFavoritePlayers(userId))
+        }
+
+        post("/api/v2/users/addFavoritePlayer/")
+        {
+            val favoritePlayerInfo = call.receive<FavoritePlayerInfo>()
+
+            favoritePlayersHandler.addFavoritePlayer(favoritePlayerInfo)
+
+            call.respond(HttpStatusCode.Created)
+        }
+
+        delete("/api/v2/users/deleteFavoritePlayer/{userId}/{playerId}")
+        {
+            val userId  : String = call.parameters["userId"     ].toString()
+            val playerId: String = call.parameters["playerId"   ].toString()
+
+            favoritePlayersHandler.removeFavoritePlayer(userId, playerId)
+
+            call.respond(HttpStatusCode.NoContent)
+        }
+
+        get("/api/v2/users/getFantasyTeams/{userId}")
+        {
+            val userId: String = call.parameters["userId"].toString()
+
+            call.respond(fantasyTeamsHandler.getFantasyTeams(userId))
+        }
+
+        get("/api/v2/users/fantasyTeamSummary/{userId}/{leagueType}/{leagueId}/{teamId}")
+        {
+            val userId      : String = call.parameters["userId"     ].toString()
+            val leagueType  : String = call.parameters["leagueType" ].toString()
+            val leagueId    : String = call.parameters["leagueId"   ].toString()
+            val teamId      : String = call.parameters["teamId"     ].toString()
+
+            val queryParameters = call.queryParameters
+
+            val weekNumber = queryParameters["weekNumber"]?.toInt() ?: 1
+
+            call.respond(fantasyTeamsHandler.getFantasyTeamSummary(userId, leagueType, leagueId, teamId, weekNumber))
         }
 
         get("/schedule/{team}/{startDate}/{endDate}")
@@ -124,11 +318,12 @@ fun Application.configureRouting(
             call.respond(GameStatHandler.getGames(team, startDate))
         }
 
-        get("/grades/batting/{id}/{period}/{startWeekNumber}")
+        get("/grades/batting/{id}/{period}/{startWeekNumber}/{season}")
         {
             val id                  = call.parameters["id"                  ].toString()
             val period              = call.parameters["period"              ].toString()
             val startWeekNumber     = call.parameters["startWeekNumber"     ].toString()
+            val season              = call.parameters["season"              ].toString()
 
             val queryParameters = call.queryParameters
 
@@ -139,7 +334,7 @@ fun Application.configureRouting(
 
             try
             {
-                val playerGrades = gradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, stats)
+                val playerGrades = gradeHandler.getGradesByPlayer(id, period, startWeekNumber, endWeekNumber, season, stats)
 
                 call.respond(playerGrades)
             }

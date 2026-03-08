@@ -14,4 +14,5 @@ object AggregateWeeklyGradesTable : Table<Nothing>("aggregate_weekly_grades")
     val stat            = varchar   ("stat"         )
     val aggregate_num   = float     ("aggregate_num")
     val percentile      = float     ("percentile"   )
+    val season          = int       ("season"       )
 }

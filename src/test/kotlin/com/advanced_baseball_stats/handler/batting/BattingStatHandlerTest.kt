@@ -12,7 +12,7 @@ import com.advanced_baseball_stats.common.BattingStatCommons.STAT_LIST
 import com.advanced_baseball_stats.exception.UnknownBattingStatException
 import com.advanced_baseball_stats.exception.UnknownPeriodException
 import com.advanced_baseball_stats.model.batting.BattingGame
-import com.advanced_baseball_stats.model.batting.BattingGameStat
+import com.advanced_baseball_stats.model.batting.GameStat
 import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.batting.HolisticBattingStatList
 import com.advanced_baseball_stats.model.common.Period
@@ -59,13 +59,13 @@ class BattingStatHandlerTest
     private val STAT_NAME_RUN               = BattingStat.RUN
     private val STAT_LIST_RUN               = mutableListOf(STAT_NAME_RUN)
     private val RUN_NUM                     = 10.0
-    private val BATTING_GAME_STAT_RUN       = BattingGameStat(STAT_NAME_RUN, RUN_NUM)
+    private val BATTING_GAME_STAT_RUN       = GameStat(STAT_NAME_RUN, RUN_NUM)
     private val BATTING_GAME_RUN            = BattingGame(FIRST_GAME, mutableListOf(BATTING_GAME_STAT_RUN))
 
     private val STAT_NAME_RBI               = BattingStat.RBI
     private val STAT_LIST_RBI               = mutableListOf(STAT_NAME_RBI)
     private val RBI_NUM                     = 12.0
-    private val BATTING_GAME_STAT_RBI       = BattingGameStat(STAT_NAME_RBI, RBI_NUM)
+    private val BATTING_GAME_STAT_RBI       = GameStat(STAT_NAME_RBI, RBI_NUM)
 
     private val HOLISTIC_BATTING_STAT_LIST_RUNS = HolisticBattingStatList(ID, listOf(BATTING_GAME_RUN))
 

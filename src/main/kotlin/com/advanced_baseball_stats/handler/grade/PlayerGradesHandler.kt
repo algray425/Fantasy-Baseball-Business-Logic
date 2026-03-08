@@ -6,5 +6,5 @@ import com.advanced_baseball_stats.model.common.Period
 
 interface PlayerGradesHandler
 {
-    fun getGrades(id: String, period: Period, startWeek: Int, endWeek: Int, stats: List<BattingStat>): MutableList<HolisticBattingGrade>
+    fun getGrades(id: String, period: Period, startWeek: Int, endWeek: Int, season: Int, stats: List<BattingStat>): MutableList<HolisticBattingGrade>
 }

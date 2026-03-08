@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BattingGame(
         val game    : Game
-    ,   val stats   : MutableList<BattingGameStat> = mutableListOf()
+    ,   val stats   : MutableList<GameStat> = mutableListOf()
 )
 {
 }
