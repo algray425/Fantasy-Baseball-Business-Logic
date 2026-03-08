@@ -12,6 +12,7 @@ import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_ST
 import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.HOME_TEAM
 import com.advanced_baseball_stats.common.BattingStatCommons.ID
+import com.advanced_baseball_stats.common.BattingStatCommons.MINIMAL_PLAYER
 import com.advanced_baseball_stats.common.BattingStatCommons.PRECIPITATION
 import com.advanced_baseball_stats.common.BattingStatCommons.SECOND_BATTING_GAME_STAT_HIT
 import com.advanced_baseball_stats.common.BattingStatCommons.START_DATE
@@ -49,8 +50,8 @@ class PerGameBattingStatHandlerTest
     private val FOURTH_GAME                                             = Game(FOURTH_GID, TEMP, WIND_SPEED, WIND_DIRECTION, CONDITION, PRECIPITATION, TIME_OF_DAY, HOME_TEAM, AWAY_TEAM)
     private val THIRD_BATTING_GAME                                      = BattingGame(THIRD_GAME, mutableListOf(FIRST_BATTING_GAME_STAT_HIT))
     private val FOURTH_BATTING_GAME                                     = BattingGame(FOURTH_GAME, mutableListOf(SECOND_BATTING_GAME_STAT_HIT))
-    private val HOLISTIC_BATTING_STAT_LIST_FROM_PLAYS                   = HolisticBattingStatList(ID, listOf(THIRD_BATTING_GAME))
-    private val HOLISTIC_BATTING_STAT_LIST_FROM_PLAYS_EMPTY_END_DATE    = HolisticBattingStatList(ID, listOf(THIRD_BATTING_GAME, FOURTH_BATTING_GAME))
+    private val HOLISTIC_BATTING_STAT_LIST_FROM_PLAYS                   = HolisticBattingStatList(MINIMAL_PLAYER, listOf(THIRD_BATTING_GAME))
+    private val HOLISTIC_BATTING_STAT_LIST_FROM_PLAYS_EMPTY_END_DATE    = HolisticBattingStatList(MINIMAL_PLAYER, listOf(THIRD_BATTING_GAME, FOURTH_BATTING_GAME))
 
     @Before
     fun beforeTests()

@@ -6,10 +6,15 @@ import com.advanced_baseball_stats.model.batting.BattingStat
 import com.advanced_baseball_stats.model.batting.HolisticBattingStatList
 import com.advanced_baseball_stats.model.common.Team
 import com.advanced_baseball_stats.model.game.*
+import com.advanced_baseball_stats.model.player.MinimalPlayer
 
 object BattingStatCommons
 {
     val ID                          = "ralec001"
+    val FIRST_NAME                  = "Cal"
+    val LAST_NAME                   = "Raleigh"
+    val TEAM                        = "SEA"
+    val POSITION                    = "C"
     val START_DATE                  = "2025-04-01"
     val END_DATE                    = "2025-04-02"
     val EMPTY_END_DATE              = ""
@@ -40,6 +45,7 @@ object BattingStatCommons
     val SECOND_BATTING_GAME_STAT_HIT                    = GameStat(STAT_NAME_HIT, SECOND_HIT_NUM)
     val FIRST_BATTING_GAME_HIT                          = BattingGame(FIRST_GAME, mutableListOf(FIRST_BATTING_GAME_STAT_HIT))
     val SECOND_BATTING_GAME_HIT                         = BattingGame(SECOND_GAME, mutableListOf(SECOND_BATTING_GAME_STAT_HIT))
-    val HOLISTIC_BATTING_STAT_LIST_HIT                  = HolisticBattingStatList(ID, listOf(FIRST_BATTING_GAME_HIT))
-    val HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE   = HolisticBattingStatList(ID, listOf(FIRST_BATTING_GAME_HIT, SECOND_BATTING_GAME_HIT))
+    val MINIMAL_PLAYER                                  = MinimalPlayer(ID, FIRST_NAME, LAST_NAME, TEAM, POSITION, "")
+    val HOLISTIC_BATTING_STAT_LIST_HIT                  = HolisticBattingStatList(MINIMAL_PLAYER, listOf(FIRST_BATTING_GAME_HIT))
+    val HOLISTIC_BATTING_STAT_LIST_HIT_EMPTY_END_DATE   = HolisticBattingStatList(MINIMAL_PLAYER, listOf(FIRST_BATTING_GAME_HIT, SECOND_BATTING_GAME_HIT))
 }

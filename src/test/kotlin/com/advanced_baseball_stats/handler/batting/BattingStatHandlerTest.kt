@@ -7,6 +7,7 @@ import com.advanced_baseball_stats.common.BattingStatCommons.FIRST_GAME
 import com.advanced_baseball_stats.common.BattingStatCommons.HIT_STAT
 import com.advanced_baseball_stats.common.BattingStatCommons.HOLISTIC_BATTING_STAT_LIST_HIT
 import com.advanced_baseball_stats.common.BattingStatCommons.ID
+import com.advanced_baseball_stats.common.BattingStatCommons.MINIMAL_PLAYER
 import com.advanced_baseball_stats.common.BattingStatCommons.START_DATE
 import com.advanced_baseball_stats.common.BattingStatCommons.STAT_LIST
 import com.advanced_baseball_stats.exception.UnknownBattingStatException
@@ -67,7 +68,7 @@ class BattingStatHandlerTest
     private val RBI_NUM                     = 12.0
     private val BATTING_GAME_STAT_RBI       = GameStat(STAT_NAME_RBI, RBI_NUM)
 
-    private val HOLISTIC_BATTING_STAT_LIST_RUNS = HolisticBattingStatList(ID, listOf(BATTING_GAME_RUN))
+    private val HOLISTIC_BATTING_STAT_LIST_RUNS = HolisticBattingStatList(MINIMAL_PLAYER, listOf(BATTING_GAME_RUN))
 
     @Before
     fun beforeTests()
