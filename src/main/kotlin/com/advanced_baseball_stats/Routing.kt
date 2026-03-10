@@ -100,6 +100,19 @@ fun Application.configureRouting(
             call.respond(playerStatsHandler.getBatterProjections(sortBy, qualified, position, leagueTypeFilter, leagueIdFilter, limit, page))
         }
 
+        get("/api/v2/players/startingPitchers/projections")
+        {
+            val queryParameters = call.queryParameters
+
+            val sortBy              = queryParameters["sortBy"      ]              ?: "PERCENTILE_OVERALL"
+            val leagueTypeFilter    = queryParameters["leagueType"  ]              ?: ""
+            val leagueIdFilter      = queryParameters["leagueId"    ]              ?: ""
+            val limit               = queryParameters["limit"       ]?.toInt()     ?: 10
+            val page                = queryParameters["page"        ]?.toInt()     ?: 0
+
+            call.respond(playerStatsHandler.getStartingPitcherProjections(sortBy, leagueTypeFilter, leagueIdFilter, limit, page))
+        }
+
         get("/api/v2/players/hitting/summary/{playerId}")
         {
             val playerId: String = call.parameters["playerId"].toString()

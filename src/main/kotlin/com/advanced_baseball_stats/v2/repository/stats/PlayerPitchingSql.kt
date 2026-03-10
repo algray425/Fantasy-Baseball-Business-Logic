@@ -3,16 +3,12 @@ package com.advanced_baseball_stats.v2.repository.stats
 import com.advanced_baseball_stats.v2.helper.AgeHelper
 import com.advanced_baseball_stats.v2.model.common.GameStat
 import com.advanced_baseball_stats.v2.model.game.OpposingPitcherSummary
-import com.advanced_baseball_stats.v2.model.pitchers.PitcherSeasonSummary
-import com.advanced_baseball_stats.v2.model.pitchers.PitcherSummary
-import com.advanced_baseball_stats.v2.model.pitchers.SeasonRankedReliefPitcher
-import com.advanced_baseball_stats.v2.model.pitchers.SeasonRankedStartingPitcher
+import com.advanced_baseball_stats.v2.model.pitchers.*
 import com.advanced_baseball_stats.v2.repository.stats.tables.*
 
 import org.ktorm.dsl.*
 import org.ktorm.expression.ColumnDeclaringExpression
 import org.ktorm.expression.OrderByExpression
-import org.ktorm.schema.ColumnDeclaring
 import org.ktorm.schema.SqlType
 
 object PlayerPitchingSql
@@ -56,6 +52,14 @@ object PlayerPitchingSql
         "ERA"               to PerGameStatsPitchingTable.era.aliased("qualityStarts"),
         "WHIP"              to PerGameStatsPitchingTable.whip.aliased("qualityStarts"),
         "KS_PER_NINE"       to PerGameStatsPitchingTable.ksPerNine.aliased("qualityStarts")
+    )
+
+    private val sortByToProjectionColumn: Map<String, OrderByExpression> = mapOf(
+        "PERCENTILE_OVERALL"    to StartingPitcherProjectionsTable.grade.desc(),
+        "QUALITY_STARTS"        to StartingPitcherProjectionsTable.qualityStarts.desc(),
+        "ERA"                   to StartingPitcherProjectionsTable.era.asc(),
+        "WHIP"                  to StartingPitcherProjectionsTable.whip.asc(),
+        "KS_PER_NINE"           to StartingPitcherProjectionsTable.ksPerNine.desc()
     )
 
     private fun getSavesColumn() = sum((PerGameStatsPitchingTable.pitcherId eq GamesTable.savingPitcher).cast(SqlType.of<Int>()!!)).aliased("saves")
@@ -293,6 +297,53 @@ object PlayerPitchingSql
                     era, whip, ksPerNine))
             }
         return rankedStartingPitcherList
+    }
+
+    fun getStartingPitcherProjections(sortBy: String, espnLeagueIds: List<Int>, limit: Int, page: Int): MutableList<StartingPitcherProjection>
+    {
+        val projections = mutableListOf<StartingPitcherProjection>()
+
+        val offset = page * limit
+
+        val columnToSortBy = sortByToProjectionColumn[sortBy] ?: StartingPitcherProjectionsTable.grade.desc()
+
+        DatabaseConnection.database.from(StartingPitcherProjectionsTable)
+            .innerJoin(BiosTable, on = StartingPitcherProjectionsTable.playerId eq BiosTable.playerId)
+            .select(BiosTable.playerId, BiosTable.firstName, BiosTable.lastName, BiosTable.currentTeam, StartingPitcherProjectionsTable.qualityStarts,
+                StartingPitcherProjectionsTable.era, StartingPitcherProjectionsTable.whip, StartingPitcherProjectionsTable.ksPerNine, StartingPitcherProjectionsTable.grade,
+                StartingPitcherProjectionsTable.percentileQualityStarts, StartingPitcherProjectionsTable.percentileEra, StartingPitcherProjectionsTable.percentileWhip,
+                StartingPitcherProjectionsTable.percentileKsPerNine, StartingPitcherProjectionsTable.percentileGrade)
+            .whereWithConditions {
+                if (espnLeagueIds.isNotEmpty())
+                {
+                    it += BiosTable.espnId notInList espnLeagueIds
+                }
+            }
+            .orderBy(columnToSortBy)
+            .limit(limit)
+            .offset(offset)
+            .forEach { projectionRow ->
+                val playerId    = projectionRow[BiosTable.playerId] ?: ""
+                val firstName   = projectionRow[BiosTable.firstName] ?: ""
+                val lastName    = projectionRow[BiosTable.lastName] ?: ""
+                val team        = projectionRow[BiosTable.currentTeam] ?: ""
+
+                val qualityStarts   = projectionRow[StartingPitcherProjectionsTable.qualityStarts] ?: 0
+                val era             = projectionRow[StartingPitcherProjectionsTable.era] ?: 0.0
+                val whip            = projectionRow[StartingPitcherProjectionsTable.whip] ?: 0.0
+                val ksPerNine       = projectionRow[StartingPitcherProjectionsTable.ksPerNine] ?: 0.0
+                val grade           = projectionRow[StartingPitcherProjectionsTable.grade] ?: 0.0
+
+                val percentileQualityStarts = projectionRow[StartingPitcherProjectionsTable.percentileQualityStarts] ?: 0.0
+                val percentileEra           = projectionRow[StartingPitcherProjectionsTable.percentileEra] ?: 0.0
+                val percentileWhip          = projectionRow[StartingPitcherProjectionsTable.percentileWhip] ?: 0.0
+                val percentileKsPerNine     = projectionRow[StartingPitcherProjectionsTable.percentileKsPerNine] ?: 0.0
+                val percentileGrade         = projectionRow[StartingPitcherProjectionsTable.percentileGrade] ?: 0.0
+
+                projections.add(StartingPitcherProjection(playerId, firstName, lastName, team, qualityStarts, era, whip, ksPerNine, grade,
+                    percentileQualityStarts, percentileEra, percentileWhip, percentileKsPerNine, percentileGrade))
+            }
+        return projections
     }
 
     fun getReliefPitchersRankedByStat(season: Int, sortBy: String, espnIdFilter: MutableList<Int>, limit: Int, page: Int): MutableList<SeasonRankedReliefPitcher>

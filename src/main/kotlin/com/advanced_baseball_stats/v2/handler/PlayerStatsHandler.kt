@@ -12,10 +12,7 @@ import com.advanced_baseball_stats.v2.model.espn.roster.EspnRosters
 import com.advanced_baseball_stats.v2.model.game.HitterGame
 import com.advanced_baseball_stats.v2.model.game.OpposingPitcherSummary
 import com.advanced_baseball_stats.v2.model.game.PitcherGame
-import com.advanced_baseball_stats.v2.model.pitchers.PitcherSeasonSummary
-import com.advanced_baseball_stats.v2.model.pitchers.PitcherSummary
-import com.advanced_baseball_stats.v2.model.pitchers.SeasonRankedReliefPitcher
-import com.advanced_baseball_stats.v2.model.pitchers.SeasonRankedStartingPitcher
+import com.advanced_baseball_stats.v2.model.pitchers.*
 import com.advanced_baseball_stats.v2.repository.stats.PlayerBattingSql
 import com.advanced_baseball_stats.v2.repository.stats.PlayerPitchingSql
 import com.advanced_baseball_stats.v2.repository.stats.TeamHittingSql
@@ -191,6 +188,35 @@ class PlayerStatsHandler
         }
 
         return PlayerBattingSql.getBatterProjections(sortBy, qualified, positions, fullLeagueIds, limit, page)
+    }
+
+    fun getStartingPitcherProjections(sortBy: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<StartingPitcherProjection>
+    {
+        val fullLeagueIds = mutableListOf<Int>()
+
+        if (leagueTypeFilter.isNotEmpty() && leagueIdFilter.isNotEmpty())
+        {
+            val espnRosters: EspnRosters?
+
+            runBlocking {
+                espnRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+            }
+
+            if (espnRosters != null)
+            {
+                for (team in espnRosters.teams)
+                {
+                    val roster = team.roster
+
+                    for (player in roster.playerEntry)
+                    {
+                        fullLeagueIds.add(player.espnId)
+                    }
+                }
+            }
+        }
+
+        return PlayerPitchingSql.getStartingPitcherProjections(sortBy, fullLeagueIds, limit, page)
     }
 
     fun getHitterSummary(playerId: String): BatterSummary?
