@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class CumulativeScore(
     @SerialName("scoreByStat")
-    val scoreByStat: EspnScoreByStat,
+    val scoreByStat: EspnScoreByStat?,
     @SerialName("wins")
     val wins: Int,
     @SerialName("losses")

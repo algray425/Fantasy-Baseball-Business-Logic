@@ -9,7 +9,7 @@ import io.ktor.client.request.*
 class EspnDataSource
 {
     //https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2025/segments/0/leagues/1166814511?view=mRoster
-    private val host = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2025/segments/0/leagues/"
+    private val host = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2026/segments/0/leagues/"
 
     suspend fun getFantasyTeamRosters(leagueId: String): EspnRosters?
     {
