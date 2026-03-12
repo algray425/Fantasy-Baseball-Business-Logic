@@ -9,6 +9,8 @@ import com.advanced_baseball_stats.handler.math.MathStatHandler
 import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
 import com.advanced_baseball_stats.handler.player.PlayerStatHandler
 import com.advanced_baseball_stats.handler.schedule.ScheduleHandler
+import com.advanced_baseball_stats.v2.exception.InvalidPlayerIdException
+import com.advanced_baseball_stats.v2.exception.InvalidUserException
 import com.advanced_baseball_stats.v2.handler.FantasyTeamsHandler
 import com.advanced_baseball_stats.v2.handler.FavoritePlayersHandler
 import com.advanced_baseball_stats.v2.handler.PlayerStatsHandler
@@ -197,9 +199,20 @@ fun Application.configureRouting(
         {
             val favoritePlayerInfo = call.receive<FavoritePlayerInfo>()
 
-            favoritePlayersHandler.addFavoritePlayer(favoritePlayerInfo)
+            try
+            {
+                favoritePlayersHandler.addFavoritePlayer(favoritePlayerInfo)
 
-            call.respond(HttpStatusCode.Created)
+                call.respond(HttpStatusCode.Created)
+            }
+            catch (ex: InvalidUserException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+            catch (ex: InvalidPlayerIdException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         delete("/api/v2/users/deleteFavoritePlayer/{userId}/{playerId}")
