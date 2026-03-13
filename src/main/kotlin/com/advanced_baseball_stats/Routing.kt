@@ -10,10 +10,13 @@ import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
 import com.advanced_baseball_stats.handler.player.PlayerStatHandler
 import com.advanced_baseball_stats.handler.schedule.ScheduleHandler
 import com.advanced_baseball_stats.v2.exception.InvalidPlayerIdException
+import com.advanced_baseball_stats.v2.exception.InvalidTeamStatsHittingRequest
+import com.advanced_baseball_stats.v2.exception.InvalidTeamStatsPitchingRequest
 import com.advanced_baseball_stats.v2.exception.InvalidUserException
 import com.advanced_baseball_stats.v2.handler.FantasyTeamsHandler
 import com.advanced_baseball_stats.v2.handler.FavoritePlayersHandler
 import com.advanced_baseball_stats.v2.handler.PlayerStatsHandler
+import com.advanced_baseball_stats.v2.handler.TeamStatsHandler
 import com.advanced_baseball_stats.v2.model.batters.FavoritePlayers.FavoritePlayerInfo
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -28,6 +31,7 @@ fun Application.configureRouting(
     ,   playerStatsHandler      : PlayerStatsHandler
     ,   favoritePlayersHandler  : FavoritePlayersHandler
     ,   fantasyTeamsHandler     : FantasyTeamsHandler
+    ,   teamStatsHandler        : TeamStatsHandler
 ){
     routing {
         get("/")
@@ -155,7 +159,6 @@ fun Application.configureRouting(
 
             val startSeason = queryParameters["startSeason"] ?: "2025"
 
-
             call.respond(playerStatsHandler.getHitterSeasonSummaries(playerId, startSeason))
         }
 
@@ -186,6 +189,36 @@ fun Application.configureRouting(
             val stat    : String    = call.parameters["stat"    ].toString()
 
             call.respond(playerStatsHandler.getPitchingStatPerGame(playerId, season, stat))
+        }
+
+        get("/api/v2/teams/hitting/stats/{teamId}/{season}")
+        {
+            val teamId: String  = call.parameters["teamId"].toString()
+            val season: Int     = call.parameters["season"]?.toInt() ?: 2026
+
+            try
+            {
+                call.respond(teamStatsHandler.getTeamHittingStatsPerSeason(teamId, season))
+            }
+            catch (ex: InvalidTeamStatsHittingRequest)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+        }
+
+        get("/api/v2/teams/pitching/stats/{teamId}/{season}")
+        {
+            val teamId: String  = call.parameters["teamId"].toString()
+            val season: Int     = call.parameters["season"]?.toInt() ?: 2026
+
+            try
+            {
+                call.respond(teamStatsHandler.getTeamPitchingStatsPerSeason(teamId, season))
+            }
+            catch (ex: InvalidTeamStatsPitchingRequest)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
         }
 
         get("/api/v2/users/getFavoritePlayers/{userId}")
