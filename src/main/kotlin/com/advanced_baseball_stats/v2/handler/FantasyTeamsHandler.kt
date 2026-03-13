@@ -61,7 +61,7 @@ class FantasyTeamsHandler
                 }
             }
 
-            val opposingPlayerSummaries = PlayerBattingSql.getEspnFantasyPlayerSummaries(opposingTeamPlayerIds, 2026)
+            val opposingPlayerSummaries = PlayerBattingSql.getEspnFantasyPlayerSummaries(opposingTeamPlayerIds, 2025)
 
             val userTeam: EspnTeam? = espnRosters.teams.find { it.id == teamId.toInt() }
 
@@ -77,7 +77,7 @@ class FantasyTeamsHandler
                 }
 
                 val(playerSummariesResponse, playerSummariesDuration) = measureTimedValue {
-                    PlayerBattingSql.getEspnFantasyPlayerSummaries(playerIds, 2026)
+                    PlayerBattingSql.getEspnFantasyPlayerSummaries(playerIds, 2025)
                 }
 
                 playerSummaries = playerSummariesResponse
@@ -99,21 +99,21 @@ class FantasyTeamsHandler
 
             //get best available hitters
             val (bestAvailableHitters, hitterDuration) = measureTimedValue {
-                PlayerBattingSql.getBestAvailableBattersOverallFromEspn(fullLeagueIds, 2026)
+                PlayerBattingSql.getBestAvailableBattersOverallFromEspn(fullLeagueIds, 2025)
             }
 
             println("Hitter rank time duration: $hitterDuration")
 
 
             val (bestAvailableStartingPitchers, startingPitcherDuration) = measureTimedValue {
-                PlayerPitchingSql.getBestAvailableStartingPitchersFromEspn(fullLeagueIds, 2026)
+                PlayerPitchingSql.getBestAvailableStartingPitchersFromEspn(fullLeagueIds, 2025)
             }
 
             println("Starting Pitcher rank time duration: $startingPitcherDuration")
 
             //get best available relief pitchers
             val (bestAvailableReliefPitchers, reliefPitcherDuration) = measureTimedValue {
-                PlayerPitchingSql.getBestAvailableReliefPitchersFromEspn(fullLeagueIds, 2026)
+                PlayerPitchingSql.getBestAvailableReliefPitchersFromEspn(fullLeagueIds, 2025)
             }
 
             println("Relief Pitcher rank time duration: $reliefPitcherDuration")
