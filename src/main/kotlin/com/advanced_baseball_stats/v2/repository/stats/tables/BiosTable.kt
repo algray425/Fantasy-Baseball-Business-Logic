@@ -21,5 +21,6 @@ object BiosTable : Table<Nothing>("Bios")
     val currentTeam = varchar("currentTeam")
     val currentPosition = varchar("currentPosition")
     val currentStatus = varchar("currentStatus")
-    val espnId = int("espnId")
+    val espnId = varchar("espnId")
+    val fantraxId = varchar("fantraxId")
 }

@@ -49,10 +49,6 @@ data class MlbGame(
     val reverseHomeAwayStatus: Boolean,
     @SerialName("inningBreakLength")
     val inningBreakLength: Int,
-    @SerialName("gamesInSeries")
-    val gamesInSeries: Int,
-    @SerialName("seriesGameNumber")
-    val seriesGameNumber: Int,
     @SerialName("seriesDescription")
     val seriesDescription: String,
     @SerialName("recordSource")

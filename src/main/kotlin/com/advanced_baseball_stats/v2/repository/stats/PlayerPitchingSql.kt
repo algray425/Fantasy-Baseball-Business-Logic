@@ -140,50 +140,51 @@ object PlayerPitchingSql
                 SeasonStatsPitchingTable.homeRunPerFlyBallPercentage
             )
             .where { (SeasonStatsPitchingTable.season greaterEq startSeason.toInt()) and (SeasonStatsPitchingTable.playerId eq playerId) }
+            .orderBy(SeasonStatsPitchingTable.season.desc())
             .forEach { seasonRow ->
-                val season                      = seasonRow[SeasonStatsPitchingTable.season] ?: -1
-                val teams                       = seasonRow[SeasonStatsPitchingTable.teams] ?: ""
-                val ipOuts                      = seasonRow[SeasonStatsPitchingTable.ipOuts] ?: 0
-                val battersFaced                = seasonRow[SeasonStatsPitchingTable.battersFaced] ?: 0
-                val hits                        = seasonRow[SeasonStatsPitchingTable.hits] ?: 0
-                val homeRuns                    = seasonRow[SeasonStatsPitchingTable.homeRuns] ?: 0
-                val runs                        = seasonRow[SeasonStatsPitchingTable.runs] ?: 0
-                val earnedRuns                  = seasonRow[SeasonStatsPitchingTable.earnedRuns] ?: 0
-                val walks                       = seasonRow[SeasonStatsPitchingTable.walks] ?: 0
-                val intentionalWalks            = seasonRow[SeasonStatsPitchingTable.intentionalWalks] ?: 0
-                val strikeOuts                  = seasonRow[SeasonStatsPitchingTable.strikeOuts] ?: 0
-                val hitByPitch                  = seasonRow[SeasonStatsPitchingTable.hitByPitch] ?: 0
-                val wildPitches                 = seasonRow[SeasonStatsPitchingTable.wildPitches] ?: 0
-                val balks                       = seasonRow[SeasonStatsPitchingTable.balks] ?: 0
-                val stolenBases                 = seasonRow[SeasonStatsPitchingTable.stolenBases] ?: 0
-                val caughtStealing              = seasonRow[SeasonStatsPitchingTable.caughtStealing] ?: 0
-                val passedBalls                 = seasonRow[SeasonStatsPitchingTable.passedBalls] ?: 0
-                val wins                        = seasonRow[SeasonStatsPitchingTable.wins] ?: 0
-                val losses                      = seasonRow[SeasonStatsPitchingTable.losses] ?: 0
-                val saves                       = seasonRow[SeasonStatsPitchingTable.saves] ?: 0
-                val holds                       = seasonRow[SeasonStatsPitchingTable.holds] ?: 0
-                val qualityStarts               = seasonRow[SeasonStatsPitchingTable.qualityStarts] ?: 0
-                val gamesStarted                = seasonRow[SeasonStatsPitchingTable.gamesStarted] ?: 0
-                val era                         = seasonRow[SeasonStatsPitchingTable.era] ?: 0.0
-                val whip                        = seasonRow[SeasonStatsPitchingTable.whip] ?: 0.0
-                val ksPerNine                   = seasonRow[SeasonStatsPitchingTable.ksPerNine] ?: 0.0
-                val walksPerNine                = seasonRow[SeasonStatsPitchingTable.walksPerNine] ?: 0.0
-                val homeRunsPerNine             = seasonRow[SeasonStatsPitchingTable.homeRunsPerNine] ?: 0.0
-                val averageFastballVelocity     = seasonRow[SeasonStatsPitchingTable.averageFastballVelocity] ?: 0.0
-                val averageExitVelocity         = seasonRow[SeasonStatsPitchingTable.averageExitVelocity] ?: 0.0
-                val zonePercentage              = seasonRow[SeasonStatsPitchingTable.zonePercentage] ?: 0.0
-                val chasePercentage             = seasonRow[SeasonStatsPitchingTable.chasePercentage] ?: 0.0
-                val swingingStrikePercentage    = seasonRow[SeasonStatsPitchingTable.swingingStrikePercentage] ?: 0.0
-                val hardHitPercentage           = seasonRow[SeasonStatsPitchingTable.hardHitPercentage] ?: 0.0
-                val barrelPercentage            = seasonRow[SeasonStatsPitchingTable.barrelPercentage] ?: 0.0
-                val groundBallPercentage        = seasonRow[SeasonStatsPitchingTable.groundBallPercentage] ?: 0.0
-                val flyBallPercentage           = seasonRow[SeasonStatsPitchingTable.flyBallPercentage] ?: 0.0
-                val lineDrivePercentage         = seasonRow[SeasonStatsPitchingTable.lineDrivePercentage] ?: 0.0
-                val popUpPercentage             = seasonRow[SeasonStatsPitchingTable.popUpPercentage] ?: 0.0
-                val strikeOutPercentage         = seasonRow[SeasonStatsPitchingTable.strikeOutPercentage] ?: 0.0
-                val walkPercentage              = seasonRow[SeasonStatsPitchingTable.walkPercentage] ?: 0.0
-                val strikeOutWalkDifference     = seasonRow[SeasonStatsPitchingTable.strikeOutWalkDifference] ?: 0.0
-                val homeRunPerFlyBallPercentage = seasonRow[SeasonStatsPitchingTable.homeRunPerFlyBallPercentage] ?: 0.0
+                val season                       = seasonRow[SeasonStatsPitchingTable.season] ?: -1
+                val teams                        = seasonRow[SeasonStatsPitchingTable.teams] ?: ""
+                val ipOuts                       = seasonRow[SeasonStatsPitchingTable.ipOuts] ?: 0
+                val battersFaced                 = seasonRow[SeasonStatsPitchingTable.battersFaced] ?: 0
+                val hits                         = seasonRow[SeasonStatsPitchingTable.hits] ?: 0
+                val homeRuns                     = seasonRow[SeasonStatsPitchingTable.homeRuns] ?: 0
+                val runs                         = seasonRow[SeasonStatsPitchingTable.runs] ?: 0
+                val earnedRuns                   = seasonRow[SeasonStatsPitchingTable.earnedRuns] ?: 0
+                val walks                        = seasonRow[SeasonStatsPitchingTable.walks] ?: 0
+                val intentionalWalks             = seasonRow[SeasonStatsPitchingTable.intentionalWalks] ?: 0
+                val strikeOuts                   = seasonRow[SeasonStatsPitchingTable.strikeOuts] ?: 0
+                val hitByPitch                   = seasonRow[SeasonStatsPitchingTable.hitByPitch] ?: 0
+                val wildPitches                  = seasonRow[SeasonStatsPitchingTable.wildPitches] ?: 0
+                val balks                        = seasonRow[SeasonStatsPitchingTable.balks] ?: 0
+                val stolenBases                  = seasonRow[SeasonStatsPitchingTable.stolenBases] ?: 0
+                val caughtStealing               = seasonRow[SeasonStatsPitchingTable.caughtStealing] ?: 0
+                val passedBalls                  = seasonRow[SeasonStatsPitchingTable.passedBalls] ?: 0
+                val wins                         = seasonRow[SeasonStatsPitchingTable.wins] ?: 0
+                val losses                       = seasonRow[SeasonStatsPitchingTable.losses] ?: 0
+                val saves                        = seasonRow[SeasonStatsPitchingTable.saves] ?: 0
+                val holds                        = seasonRow[SeasonStatsPitchingTable.holds] ?: 0
+                val qualityStarts                = seasonRow[SeasonStatsPitchingTable.qualityStarts] ?: 0
+                val gamesStarted                 = seasonRow[SeasonStatsPitchingTable.gamesStarted] ?: 0
+                val era                          = seasonRow[SeasonStatsPitchingTable.era] ?: 0.0
+                val whip                         = seasonRow[SeasonStatsPitchingTable.whip] ?: 0.0
+                val ksPerNine                    = seasonRow[SeasonStatsPitchingTable.ksPerNine] ?: 0.0
+                val walksPerNine                 = seasonRow[SeasonStatsPitchingTable.walksPerNine] ?: 0.0
+                val homeRunsPerNine              = seasonRow[SeasonStatsPitchingTable.homeRunsPerNine] ?: 0.0
+                val averageFastballVelocity      = seasonRow[SeasonStatsPitchingTable.averageFastballVelocity] ?: 0.0
+                val averageExitVelocity          = seasonRow[SeasonStatsPitchingTable.averageExitVelocity] ?: 0.0
+                val zonePercentage               = seasonRow[SeasonStatsPitchingTable.zonePercentage] ?: 0.0
+                val chasePercentage              = seasonRow[SeasonStatsPitchingTable.chasePercentage] ?: 0.0
+                val swingingStrikePercentage     = seasonRow[SeasonStatsPitchingTable.swingingStrikePercentage] ?: 0.0
+                val hardHitPercentage            = seasonRow[SeasonStatsPitchingTable.hardHitPercentage] ?: 0.0
+                val barrelPercentage             = seasonRow[SeasonStatsPitchingTable.barrelPercentage] ?: 0.0
+                val groundBallPercentage         = seasonRow[SeasonStatsPitchingTable.groundBallPercentage] ?: 0.0
+                val flyBallPercentage            = seasonRow[SeasonStatsPitchingTable.flyBallPercentage] ?: 0.0
+                val lineDrivePercentage          = seasonRow[SeasonStatsPitchingTable.lineDrivePercentage] ?: 0.0
+                val popUpPercentage              = seasonRow[SeasonStatsPitchingTable.popUpPercentage] ?: 0.0
+                val strikeOutPercentage          = seasonRow[SeasonStatsPitchingTable.strikeOutPercentage] ?: 0.0
+                val walkPercentage               = seasonRow[SeasonStatsPitchingTable.walkPercentage] ?: 0.0
+                val strikeOutWalkDifference      = seasonRow[SeasonStatsPitchingTable.strikeOutWalkDifference] ?: 0.0
+                val homeRunPerFlyBallPercentage  = seasonRow[SeasonStatsPitchingTable.homeRunPerFlyBallPercentage] ?: 0.0
 
                 seasonSummaries.add(PitcherSeasonSummary(season, teams, ipOuts, battersFaced, hits, homeRuns, runs, earnedRuns, walks,
                     intentionalWalks, strikeOuts, hitByPitch, wildPitches, balks, stolenBases, caughtStealing, passedBalls, wins, losses,
@@ -195,7 +196,33 @@ object PlayerPitchingSql
         return seasonSummaries
     }
 
-    fun getStartingPitchersRankedByStat(season: Int, sortBy: String, espnIdFilter: MutableList<Int>, limit: Int, page: Int): MutableList<SeasonRankedStartingPitcher>
+    fun getStartingPitchersByTeam(team: String, season: Int): List<SeasonRankedStartingPitcher>
+    {
+        val pitchers = mutableListOf<SeasonRankedStartingPitcher>()
+
+        DatabaseConnection.database.from(SeasonStatsPitchingTable)
+            .innerJoin(BiosTable, on = BiosTable.playerId eq SeasonStatsPitchingTable.playerId)
+            .innerJoin(SeasonGradesStartingPitchersTable, on = SeasonGradesStartingPitchersTable.playerId eq SeasonStatsPitchingTable.playerId)
+            .select(BiosTable.playerId, BiosTable.firstName, BiosTable.lastName, BiosTable.currentTeam, SeasonGradesStartingPitchersTable.percentileOverall,
+                SeasonStatsPitchingTable.qualityStarts, SeasonStatsPitchingTable.era, SeasonStatsPitchingTable.whip, SeasonStatsPitchingTable.ksPerNine)
+            .where{ (BiosTable.currentTeam eq team) and (SeasonStatsPitchingTable.season eq season) and (SeasonGradesStartingPitchersTable.season eq season) }
+            .forEach { pitcherRow ->
+                val playerId            = pitcherRow[BiosTable.playerId                                 ] ?: ""
+                val firstName           = pitcherRow[BiosTable.firstName                                ] ?: ""
+                val lastName            = pitcherRow[BiosTable.lastName                                 ] ?: ""
+                val pitcherTeam         = pitcherRow[BiosTable.currentTeam                              ] ?: ""
+                val percentileOverall   = pitcherRow[SeasonGradesStartingPitchersTable.percentileOverall] ?: 0.0
+                val qualityStarts       = pitcherRow[SeasonStatsPitchingTable.qualityStarts             ] ?: 0
+                val era                 = pitcherRow[SeasonStatsPitchingTable.era                       ] ?: 0.0
+                val whip                = pitcherRow[SeasonStatsPitchingTable.whip                      ] ?: 0.0
+                val ksPerNine           = pitcherRow[SeasonStatsPitchingTable.ksPerNine                 ] ?: 0.0
+
+                pitchers.add(SeasonRankedStartingPitcher(playerId, firstName, lastName, pitcherTeam, percentileOverall, qualityStarts, era, whip, ksPerNine))
+            }
+        return pitchers
+    }
+
+    fun getStartingPitchersRankedByStat(season: Int, sortBy: String, idFilter: MutableList<String>, limit: Int, page: Int): MutableList<SeasonRankedStartingPitcher>
     {
         val rankedStartingPitchers = mutableListOf<SeasonRankedStartingPitcher>()
 
@@ -219,9 +246,10 @@ object PlayerPitchingSql
                 it += SeasonStatsPitchingTable.season eq season
                 it += SeasonGradesStartingPitchersTable.season eq season
 
-                if (espnIdFilter.isNotEmpty())
+                if (idFilter.isNotEmpty())
                 {
-                    it += BiosTable.espnId notInList espnIdFilter
+                    it += BiosTable.espnId      notInList idFilter
+                    it += BiosTable.fantraxId   notInList idFilter
                 }
             }
             .orderBy(orderExpression)
@@ -243,7 +271,7 @@ object PlayerPitchingSql
         return rankedStartingPitchers
     }
 
-    fun getStartingPitcherRankedByStatInDateRange(season: Int, sortBy: String, startDate: String, endDate: String, espnIdFilter: MutableList<Int>, limit: Int, page: Int): MutableList<SeasonRankedStartingPitcher>
+    fun getStartingPitcherRankedByStatInDateRange(season: Int, sortBy: String, startDate: String, endDate: String, idFilter: MutableList<String>, limit: Int, page: Int): MutableList<SeasonRankedStartingPitcher>
     {
         val rankedStartingPitcherList = mutableListOf<SeasonRankedStartingPitcher>()
 
@@ -261,14 +289,15 @@ object PlayerPitchingSql
                 it += GamesTable.date between dateRanges
                 it += SeasonGradesStartingPitchersTable.season eq season
 
-                if (espnIdFilter.isNotEmpty())
+                if (idFilter.isNotEmpty())
                 {
-                    it += BiosTable.espnId notInList espnIdFilter
+                    it += BiosTable.espnId      notInList idFilter
+                    it += BiosTable.fantraxId   notInList idFilter
                 }
             }
             .limit(limit)
             .offset(offset)
-            .groupBy(PerGameStatsPitchingTable.pitcherId)
+            .groupBy(PerGameStatsPitchingTable.pitcherId, BiosTable.firstName, BiosTable.lastName, BiosTable.currentTeam, SeasonGradesStartingPitchersTable.playerId)
 
             var convertedSortBy = sortBy
 
@@ -299,7 +328,7 @@ object PlayerPitchingSql
         return rankedStartingPitcherList
     }
 
-    fun getStartingPitcherProjections(sortBy: String, espnLeagueIds: List<Int>, limit: Int, page: Int): MutableList<StartingPitcherProjection>
+    fun getStartingPitcherProjections(sortBy: String, team: String, idFilter: List<String>, limit: Int, page: Int): MutableList<StartingPitcherProjection>
     {
         val projections = mutableListOf<StartingPitcherProjection>()
 
@@ -314,9 +343,14 @@ object PlayerPitchingSql
                 StartingPitcherProjectionsTable.percentileQualityStarts, StartingPitcherProjectionsTable.percentileEra, StartingPitcherProjectionsTable.percentileWhip,
                 StartingPitcherProjectionsTable.percentileKsPerNine, StartingPitcherProjectionsTable.percentileGrade)
             .whereWithConditions {
-                if (espnLeagueIds.isNotEmpty())
+                if (idFilter.isNotEmpty())
                 {
-                    it += BiosTable.espnId notInList espnLeagueIds
+                    it += BiosTable.espnId      notInList idFilter
+                    it += BiosTable.fantraxId   notInList idFilter
+                }
+                if (team.isNotEmpty())
+                {
+                    it += BiosTable.currentTeam eq team
                 }
             }
             .orderBy(columnToSortBy)
@@ -346,7 +380,35 @@ object PlayerPitchingSql
         return projections
     }
 
-    fun getReliefPitchersRankedByStat(season: Int, sortBy: String, espnIdFilter: MutableList<Int>, limit: Int, page: Int): MutableList<SeasonRankedReliefPitcher>
+    fun getReliefPitchersByTeam(team: String, season: Int): List<SeasonRankedReliefPitcher>
+    {
+        val pitchers = mutableListOf<SeasonRankedReliefPitcher>()
+
+        DatabaseConnection.database.from(SeasonStatsPitchingTable)
+            .innerJoin(BiosTable, on = BiosTable.playerId eq SeasonStatsPitchingTable.playerId)
+            .innerJoin(SeasonGradesReliefPitchersTable, on = SeasonGradesReliefPitchersTable.playerId eq SeasonStatsPitchingTable.playerId)
+            .select(BiosTable.playerId, BiosTable.firstName, BiosTable.lastName, BiosTable.currentTeam, SeasonGradesReliefPitchersTable.percentileOverall,
+                SeasonStatsPitchingTable.saves, SeasonStatsPitchingTable.holds, SeasonStatsPitchingTable.era, SeasonStatsPitchingTable.whip, SeasonStatsPitchingTable.ksPerNine)
+            .where{ (BiosTable.currentTeam eq team) and (SeasonStatsPitchingTable.season eq season) and (SeasonGradesReliefPitchersTable.season eq season) }
+            .forEach { pitcherRow ->
+                val playerId            = pitcherRow[BiosTable.playerId                                 ] ?: ""
+                val firstName           = pitcherRow[BiosTable.firstName                                ] ?: ""
+                val lastName            = pitcherRow[BiosTable.lastName                                 ] ?: ""
+                val pitcherTeam         = pitcherRow[BiosTable.currentTeam                              ] ?: ""
+                val percentileOverall   = pitcherRow[SeasonGradesReliefPitchersTable.percentileOverall  ] ?: 0.0
+                val saves               = pitcherRow[SeasonStatsPitchingTable.saves                     ] ?: 0
+                val holds               = pitcherRow[SeasonStatsPitchingTable.holds                     ] ?: 0
+                val era                 = pitcherRow[SeasonStatsPitchingTable.era                       ] ?: 0.0
+                val whip                = pitcherRow[SeasonStatsPitchingTable.whip                      ] ?: 0.0
+                val ksPerNine           = pitcherRow[SeasonStatsPitchingTable.ksPerNine                 ] ?: 0.0
+
+                pitchers.add(SeasonRankedReliefPitcher(playerId, firstName, lastName, team, percentileOverall, saves, holds, era, whip, ksPerNine))
+            }
+
+        return pitchers
+    }
+
+    fun getReliefPitchersRankedByStat(season: Int, sortBy: String, idFilter: MutableList<String>, limit: Int, page: Int): MutableList<SeasonRankedReliefPitcher>
     {
         val rankedReliefPitchers = mutableListOf<SeasonRankedReliefPitcher>()
 
@@ -370,9 +432,10 @@ object PlayerPitchingSql
                 it += SeasonStatsPitchingTable.season eq season
                 it += SeasonGradesReliefPitchersTable.season eq season
 
-                if (espnIdFilter.isNotEmpty())
+                if (idFilter.isNotEmpty())
                 {
-                    it += BiosTable.espnId notInList espnIdFilter
+                    it += BiosTable.espnId      notInList idFilter
+                    it += BiosTable.fantraxId   notInList idFilter
                 }
             }
             .orderBy(orderExpression)
@@ -395,7 +458,7 @@ object PlayerPitchingSql
         return rankedReliefPitchers
     }
 
-    fun getReliefPitcherRankedByStatInDateRange(season: Int, sortBy: String, startDate: String, endDate: String, espnIdFilter: MutableList<Int>, limit: Int, page: Int): MutableList<SeasonRankedReliefPitcher>
+    fun getReliefPitcherRankedByStatInDateRange(season: Int, sortBy: String, startDate: String, endDate: String, idFilter: MutableList<String>, limit: Int, page: Int): MutableList<SeasonRankedReliefPitcher>
     {
         val rankedReliefPitcherList = mutableListOf<SeasonRankedReliefPitcher>()
 
@@ -413,14 +476,15 @@ object PlayerPitchingSql
                 it += GamesTable.date between dateRanges
                 it += SeasonGradesReliefPitchersTable.season eq season
 
-                if (espnIdFilter.isNotEmpty())
+                if (idFilter.isNotEmpty())
                 {
-                    it += BiosTable.espnId notInList espnIdFilter
+                    it += BiosTable.espnId      notInList idFilter
+                    it += BiosTable.fantraxId   notInList idFilter
                 }
             }
             .limit(limit)
             .offset(offset)
-            .groupBy(PerGameStatsPitchingTable.pitcherId)
+            .groupBy(PerGameStatsPitchingTable.pitcherId, BiosTable.firstName, BiosTable.lastName, BiosTable.currentTeam, SeasonGradesReliefPitchersTable.playerId)
 
         var convertedSortBy = sortBy
 
@@ -452,7 +516,7 @@ object PlayerPitchingSql
         return rankedReliefPitcherList
     }
 
-    fun getBestAvailableStartingPitchersFromEspn(rosteredPlayers: List<Int>, season: Int): MutableList<SeasonRankedStartingPitcher>
+    fun getBestAvailableStartingPitchersFromEspn(rosteredPlayers: List<String>, season: Int): MutableList<SeasonRankedStartingPitcher>
     {
         val rankedStartingPitcherList: MutableList<SeasonRankedStartingPitcher> = mutableListOf()
 
@@ -483,7 +547,7 @@ object PlayerPitchingSql
         return rankedStartingPitcherList
     }
 
-    fun getBestAvailableReliefPitchersFromEspn(rosteredPlayers: List<Int>, season: Int): MutableList<SeasonRankedReliefPitcher>
+    fun getBestAvailableReliefPitchersFromEspn(rosteredPlayers: List<String>, season: Int): MutableList<SeasonRankedReliefPitcher>
     {
         val rankedReliefPitcherList: MutableList<SeasonRankedReliefPitcher> = mutableListOf()
 
@@ -517,16 +581,16 @@ object PlayerPitchingSql
 
     fun getOpposingPitcherSummary(pitcherId: String, season: Int): OpposingPitcherSummary?
     {
-        DatabaseConnection.database.from(SeasonGradesStartingPitchersTable)
-            .innerJoin(BiosTable, on = BiosTable.playerId eq pitcherId)
+        DatabaseConnection.database.from(BiosTable)
+            .leftJoin(SeasonGradesStartingPitchersTable, on = (SeasonGradesStartingPitchersTable.playerId eq BiosTable.playerId) and (SeasonGradesStartingPitchersTable.playerId eq pitcherId) and (SeasonGradesStartingPitchersTable.season eq season))
             .select(BiosTable.firstName, BiosTable.lastName, SeasonGradesStartingPitchersTable.percentileOverall)
-            .where{ (SeasonGradesStartingPitchersTable.playerId eq pitcherId) and (SeasonGradesStartingPitchersTable.season eq season)}
+            .where { BiosTable.playerId eq pitcherId }
             .forEachIndexed { index, pitcherRow ->
                 if (index == 0)
                 {
                     val firstName           = pitcherRow[BiosTable.firstName                                ] ?: ""
                     val lastName            = pitcherRow[BiosTable.lastName                                 ] ?: ""
-                    val percentileOverall   = pitcherRow[SeasonGradesStartingPitchersTable.percentileOverall] ?: 0.0
+                    val percentileOverall   = pitcherRow[SeasonGradesStartingPitchersTable.percentileOverall] ?: -1.0
 
                     return OpposingPitcherSummary(pitcherId, firstName, lastName, percentileOverall)
                 }

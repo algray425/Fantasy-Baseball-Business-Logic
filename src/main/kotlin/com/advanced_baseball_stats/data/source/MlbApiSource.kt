@@ -79,4 +79,35 @@ class MlbApiSource
             return null
         }
     }
+
+    suspend fun getSchedulePerDateRange(startDate: String, endDate: String): Schedule?
+    {
+        val client = CioHttpClient.getClient()
+
+        val scheduleUrl = host + scheduleEndpoint
+
+        //$host$scheduleEndpoint&team=$teamMlbId&&sportId=1&startDate=$startDate&endDate=$endDate&hydrate=probablePitcher
+        val response = client.get(scheduleUrl)
+        {
+            url {
+                parameters.append("sportId"     , sportId               )
+                parameters.append("startDate"   , startDate             )
+                parameters.append("endDate"     , endDate               )
+                parameters.append("hydrate"     , hydration             )
+            }
+        }
+
+        //client.close()
+
+        if (response.status.value in 200..299)
+        {
+            val schedule: Schedule = response.body()
+
+            return schedule
+        }
+        else
+        {
+            return null
+        }
+    }
 }

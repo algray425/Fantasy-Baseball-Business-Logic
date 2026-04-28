@@ -1,17 +1,20 @@
 package com.advanced_baseball_stats.v2.data
 
 import com.advanced_baseball_stats.data.source.CioHttpClient
+import com.advanced_baseball_stats.transformer.EspnToHolisticLeagueTransformer
 import com.advanced_baseball_stats.v2.model.espn.matchup.EspnSchedule
 import com.advanced_baseball_stats.v2.model.espn.roster.EspnRosters
+import com.advanced_baseball_stats.v2.model.fantasy.HolisiticFantasyLeague
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
 class EspnDataSource
 {
     //https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2025/segments/0/leagues/1166814511?view=mRoster
-    private val host = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2026/segments/0/leagues/"
+    private val host                        = "https://lm-api-reads.fantasy.espn.com/apis/v3/games/flb/seasons/2026/segments/0/leagues/"
+    private val holisticLeagueTransformer   = EspnToHolisticLeagueTransformer()
 
-    suspend fun getFantasyTeamRosters(leagueId: String): EspnRosters?
+    suspend fun getFantasyTeamRosters(leagueId: String): HolisiticFantasyLeague?
     {
         val client = CioHttpClient.getClient()
 
@@ -30,7 +33,7 @@ class EspnDataSource
         {
             val espnRosters: EspnRosters = response.body()
 
-            return espnRosters
+            return holisticLeagueTransformer.transform(espnRosters)
         }
         else
         {
@@ -43,9 +46,9 @@ class EspnDataSource
     {
         val client = CioHttpClient.getClient()
 
-        val rosterUrl = host + leagueId
+        val matchupUrl = host + leagueId
 
-        val response = client.get(rosterUrl)
+        val response = client.get(matchupUrl)
         {
             url {
                 parameters.append("view", "mMatchup")

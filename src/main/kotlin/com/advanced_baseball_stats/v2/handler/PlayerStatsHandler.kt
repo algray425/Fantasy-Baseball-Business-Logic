@@ -5,10 +5,14 @@ import com.advanced_baseball_stats.model.MlbApi.Schedule
 import com.advanced_baseball_stats.model.common.Team
 import com.advanced_baseball_stats.utility.converter.date.DateHelper
 import com.advanced_baseball_stats.v2.data.EspnDataSource
+import com.advanced_baseball_stats.v2.data.FanTraxDataSource
 import com.advanced_baseball_stats.v2.helper.MlbIdToTeamAbbreviationConverter
 import com.advanced_baseball_stats.v2.model.batters.*
 import com.advanced_baseball_stats.v2.model.common.GameStat
 import com.advanced_baseball_stats.v2.model.espn.roster.EspnRosters
+import com.advanced_baseball_stats.v2.model.fantasy.HolisiticFantasyLeague
+import com.advanced_baseball_stats.v2.model.fantasy.HolisticFantasyRoster
+import com.advanced_baseball_stats.v2.model.fantrax.roster.FanTraxLeague
 import com.advanced_baseball_stats.v2.model.game.HitterGame
 import com.advanced_baseball_stats.v2.model.game.OpposingPitcherSummary
 import com.advanced_baseball_stats.v2.model.game.PitcherGame
@@ -19,33 +23,43 @@ import com.advanced_baseball_stats.v2.repository.stats.TeamHittingSql
 import com.advanced_baseball_stats.v2.repository.stats.TeamPitchingSql
 
 import kotlinx.coroutines.runBlocking
+import org.ktorm.dsl.eq
+import java.time.LocalDate
 
 class PlayerStatsHandler
 {
-    val mlbApiSource    : MlbApiSource      = MlbApiSource()
-    val espnDataSource  : EspnDataSource    = EspnDataSource()
+    private val mlbApiSource        : MlbApiSource      = MlbApiSource()
+    private val fanTraxDataSource   : FanTraxDataSource = FanTraxDataSource()
+    private val espnDataSource      : EspnDataSource    = EspnDataSource()
 
     fun getRankedHittersBySeason(season: Int, sortBy: String, position: String, startDate: String, endDate: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<SeasonRankedBatter>
     {
-        val fullLeagueIds: MutableList<Int> = mutableListOf()
+        val fullLeagueIds: MutableList<String> = mutableListOf()
 
         if (leagueTypeFilter.isNotEmpty() && leagueIdFilter.isNotEmpty())
         {
-            val espnRosters: EspnRosters?
+            var fantasyTeamRosters: HolisiticFantasyLeague? = null
 
-            runBlocking {
-                espnRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+            if (leagueTypeFilter.equals("ESPN"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
+            }
+            else if (leagueTypeFilter.equals("FANTRAX"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = fanTraxDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
             }
 
-            if (espnRosters != null)
+            if (fantasyTeamRosters != null)
             {
-                for (team in espnRosters.teams)
+                for (team in fantasyTeamRosters!!.rosters)
                 {
-                    val roster = team.roster
-
-                    for (player in roster.playerEntry)
+                    for (player in team.playerIds)
                     {
-                        fullLeagueIds.add(player.espnId)
+                        fullLeagueIds.add(player)
                     }
                 }
             }
@@ -77,25 +91,32 @@ class PlayerStatsHandler
 
     fun getRankedStartingPitchersBySeason(season: Int, sortBy: String, startDate: String, endDate: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<SeasonRankedStartingPitcher>
     {
-        val fullLeagueIds: MutableList<Int> = mutableListOf()
+        val fullLeagueIds: MutableList<String> = mutableListOf()
 
         if (leagueTypeFilter.isNotEmpty() && leagueIdFilter.isNotEmpty())
         {
-            val espnRosters: EspnRosters?
+            var fantasyTeamRosters: HolisiticFantasyLeague? = null
 
-            runBlocking {
-                espnRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+            if (leagueTypeFilter.equals("ESPN"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
+            }
+            else if (leagueTypeFilter.equals("FANTRAX"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = fanTraxDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
             }
 
-            if (espnRosters != null)
+            if (fantasyTeamRosters != null)
             {
-                for (team in espnRosters.teams)
+                for (team in fantasyTeamRosters!!.rosters)
                 {
-                    val roster = team.roster
-
-                    for (player in roster.playerEntry)
+                    for (player in team.playerIds)
                     {
-                        fullLeagueIds.add(player.espnId)
+                        fullLeagueIds.add(player)
                     }
                 }
             }
@@ -113,25 +134,32 @@ class PlayerStatsHandler
 
     fun getRankedReliefPitchersBySeason(season: Int, sortBy: String, startDate: String, endDate: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<SeasonRankedReliefPitcher>
     {
-        val fullLeagueIds: MutableList<Int> = mutableListOf()
+        val fullLeagueIds: MutableList<String> = mutableListOf()
 
         if (leagueTypeFilter.isNotEmpty() && leagueIdFilter.isNotEmpty())
         {
-            val espnRosters: EspnRosters?
+            var fantasyTeamRosters: HolisiticFantasyLeague? = null
 
-            runBlocking {
-                espnRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+            if (leagueTypeFilter.equals("ESPN"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
+            }
+            else if (leagueTypeFilter.equals("FANTRAX"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = fanTraxDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
             }
 
-            if (espnRosters != null)
+            if (fantasyTeamRosters != null)
             {
-                for (team in espnRosters.teams)
+                for (team in fantasyTeamRosters!!.rosters)
                 {
-                    val roster = team.roster
-
-                    for (player in roster.playerEntry)
+                    for (player in team.playerIds)
                     {
-                        fullLeagueIds.add(player.espnId)
+                        fullLeagueIds.add(player)
                     }
                 }
             }
@@ -149,25 +177,34 @@ class PlayerStatsHandler
 
     fun getBatterProjections(sortBy: String, qualified: Boolean, position: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<BatterProjection>
     {
-        val fullLeagueIds = mutableListOf<Int>()
+        val fullLeagueIds = mutableListOf<String>()
 
         if (leagueTypeFilter.isNotEmpty() && leagueIdFilter.isNotEmpty())
         {
-            val espnRosters: EspnRosters?
+            var fantasyTeamRosters: HolisiticFantasyLeague? = null
 
-            runBlocking {
-                espnRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+            if (leagueTypeFilter.equals("ESPN"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
+            }
+            else if (leagueTypeFilter.equals("FANTRAX"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = fanTraxDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
             }
 
-            if (espnRosters != null)
+            if (fantasyTeamRosters != null)
             {
-                for (team in espnRosters.teams)
+                for (team in fantasyTeamRosters!!.rosters)
                 {
-                    val roster = team.roster
+                    val roster = team.playerIds
 
-                    for (player in roster.playerEntry)
+                    for (player in roster)
                     {
-                        fullLeagueIds.add(player.espnId)
+                        fullLeagueIds.add(player)
                     }
                 }
             }
@@ -190,47 +227,57 @@ class PlayerStatsHandler
         return PlayerBattingSql.getBatterProjections(sortBy, qualified, positions, fullLeagueIds, limit, page)
     }
 
-    fun getStartingPitcherProjections(sortBy: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<StartingPitcherProjection>
+    fun getStartingPitcherProjections(sortBy: String, team: String, leagueTypeFilter: String, leagueIdFilter: String, limit: Int, page: Int): MutableList<StartingPitcherProjection>
     {
-        val fullLeagueIds = mutableListOf<Int>()
+        val fullLeagueIds = mutableListOf<String>()
 
         if (leagueTypeFilter.isNotEmpty() && leagueIdFilter.isNotEmpty())
         {
-            val espnRosters: EspnRosters?
+            var fantasyTeamRosters: HolisiticFantasyLeague? = null
 
-            runBlocking {
-                espnRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+            if (leagueTypeFilter.equals("ESPN"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = espnDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
+            }
+            else if (leagueTypeFilter.equals("FANTRAX"))
+            {
+                runBlocking {
+                    fantasyTeamRosters = fanTraxDataSource.getFantasyTeamRosters(leagueIdFilter)
+                }
             }
 
-            if (espnRosters != null)
+            if (fantasyTeamRosters != null)
             {
-                for (team in espnRosters.teams)
+                for (fantasyTeam in fantasyTeamRosters!!.rosters)
                 {
-                    val roster = team.roster
-
-                    for (player in roster.playerEntry)
+                    for (player in fantasyTeam.playerIds)
                     {
-                        fullLeagueIds.add(player.espnId)
+                        fullLeagueIds.add(player)
                     }
                 }
             }
         }
 
-        return PlayerPitchingSql.getStartingPitcherProjections(sortBy, fullLeagueIds, limit, page)
+        return PlayerPitchingSql.getStartingPitcherProjections(sortBy, team, fullLeagueIds, limit, page)
     }
 
     fun getHitterSummary(playerId: String): BatterSummary?
     {
         val playerSummary = PlayerBattingSql.getPlayerSummary(playerId)
 
-        if (playerSummary != null)
+        if (playerSummary != null && playerSummary.currentTeam.isNotEmpty())
         {
             val team = Team.valueOf(playerSummary.currentTeam)
 
             val schedule: Schedule?
 
+            val currentDate     = LocalDate.now()
+            val nextWeekDate    = currentDate.plusWeeks(1)
+
             runBlocking {
-                schedule = mlbApiSource.getSchedulePerTeam(team, "2026-03-25", "2026-03-29")
+                schedule = mlbApiSource.getSchedulePerTeam(team, currentDate.toString(), nextWeekDate.toString())
             }
 
             if (schedule != null)
@@ -282,8 +329,11 @@ class PlayerStatsHandler
 
             val schedule: Schedule?
 
+            val currentDate     = LocalDate.now()
+            val nextWeekDate    = currentDate.plusWeeks(1)
+
             runBlocking {
-                schedule = mlbApiSource.getSchedulePerTeam(team, "2026-03-25", "2026-03-29")
+                schedule = mlbApiSource.getSchedulePerTeam(team, currentDate.toString(), nextWeekDate.toString())
             }
 
             if (schedule != null)
@@ -301,7 +351,18 @@ class PlayerStatsHandler
 
                         val opposingTeamHittingGrades = TeamHittingSql.getHittingGradesByTeam(opposingTeamAbbr, 2026)
 
-                        pitcherSummary.addGame(PitcherGame(opposingTeamAbbr, venue, date.date, opposingTeamHittingGrades))
+                        var isStartingPitcher = false
+
+                        if (homeTeamAbbr.equals(pitcherSummary.currentTeam) && game.teams.homeTeam.probablePitcher != null && game.teams.homeTeam.probablePitcher.id.toString() == pitcherSummary.playerId)
+                        {
+                            isStartingPitcher = true
+                        }
+                        else if (awayTeamAbbr.equals(pitcherSummary.currentTeam) && game.teams.awayTeam.probablePitcher != null && game.teams.awayTeam.probablePitcher.id.toString() == pitcherSummary.playerId)
+                        {
+                            isStartingPitcher = true
+                        }
+
+                        pitcherSummary.addGame(PitcherGame(opposingTeamAbbr, venue, date.date, isStartingPitcher, opposingTeamHittingGrades))
                     }
                 }
             }

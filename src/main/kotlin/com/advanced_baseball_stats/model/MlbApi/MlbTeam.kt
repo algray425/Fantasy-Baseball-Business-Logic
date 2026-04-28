@@ -13,8 +13,6 @@ data class MlbTeam(
     val probablePitcher: ProbablePitcher? = null,
     @SerialName("splitSquad")
     val splitSquad: Boolean,
-    @SerialName("seriesNumber")
-    val seriesNumber: Int
 )
 {
 }

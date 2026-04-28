@@ -1,4 +1,4 @@
-package com.advanced_baseball_stats.v2.model.teams.hitting.pitching
+package com.advanced_baseball_stats.v2.model.teams.pitching
 
 import kotlinx.serialization.Serializable
 

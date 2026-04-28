@@ -7,4 +7,6 @@ object UserTable: Table<Nothing>("Users")
 {
     val id = varchar("id")
     val userName = varchar("userName")
+    val email = varchar("email")
+    val password = varchar("password")
 }

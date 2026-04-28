@@ -11,10 +11,7 @@ import com.advanced_baseball_stats.handler.grade.PerGamePercentileGradesHandler
 import com.advanced_baseball_stats.handler.pitching.AggregatePitchingStatHandler
 import com.advanced_baseball_stats.handler.pitching.PerGamePitchingStatHandler
 import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
-import com.advanced_baseball_stats.v2.handler.FantasyTeamsHandler
-import com.advanced_baseball_stats.v2.handler.FavoritePlayersHandler
-import com.advanced_baseball_stats.v2.handler.PlayerStatsHandler
-import com.advanced_baseball_stats.v2.handler.TeamStatsHandler
+import com.advanced_baseball_stats.v2.handler.*
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -45,8 +42,9 @@ fun Application.module()
     val favoritePlayersHandler  = FavoritePlayersHandler()
     val fantasyTeamsHandler     = FantasyTeamsHandler()
     val teamStatsHandler        = TeamStatsHandler()
+    val userHandler             = UserHandler()
 
     configureSerialization  ()
     configureCors           ()
-    configureRouting        (battingStatHandler, pitchingStatHandler, gradeHandler, playerStatsHandler, favoritePlayersHandler, fantasyTeamsHandler, teamStatsHandler)
+    configureRouting        (battingStatHandler, pitchingStatHandler, gradeHandler, playerStatsHandler, favoritePlayersHandler, fantasyTeamsHandler, teamStatsHandler, userHandler)
 }

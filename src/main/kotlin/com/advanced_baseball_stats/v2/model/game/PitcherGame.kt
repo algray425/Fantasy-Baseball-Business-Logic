@@ -7,6 +7,7 @@ class PitcherGame(
     val opposingTeam                            : String,
     val venue                                   : String,
     val date                                    : String,
+    val starting                                : Boolean,
     val opposingTeamHittingPercentileOverall    : Double?,
 ) {
 }

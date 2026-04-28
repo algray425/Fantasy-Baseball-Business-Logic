@@ -132,3 +132,6 @@ hs_err_pid*
 
 # Project specific ignores
 *DatabaseConstants*
+src/main/kotlin/com/advanced_baseball_stats/repository/helper/database/DatabaseConstants.kt
+src/main/kotlin/com/advanced_baseball_stats/repository/helper/database/DatabaseConstants.kt
+/db

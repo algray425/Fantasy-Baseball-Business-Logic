@@ -1,5 +1,6 @@
 package com.advanced_baseball_stats.v2.repository.stats.tables
 
+import com.advanced_baseball_stats.v2.repository.customTypes.SafeRealSqlType
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.varchar
@@ -58,5 +59,5 @@ object SeasonStatsPitchingTable : Table<Nothing>("SeasonStatsPitching")
     val strikeOutPercentage = double("strikeOutPercentage")
     val walkPercentage = double("walkPercentage")
     val strikeOutWalkDifference = double("strikeOutWalkDifference")
-    val homeRunPerFlyBallPercentage = double("homeRunPerFlyBallPercentage")
+    val homeRunPerFlyBallPercentage = registerColumn("homeRunPerFlyBallPercentage", SafeRealSqlType)
 }

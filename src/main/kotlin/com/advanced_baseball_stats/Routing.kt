@@ -9,15 +9,11 @@ import com.advanced_baseball_stats.handler.math.MathStatHandler
 import com.advanced_baseball_stats.handler.pitching.PitchingStatHandler
 import com.advanced_baseball_stats.handler.player.PlayerStatHandler
 import com.advanced_baseball_stats.handler.schedule.ScheduleHandler
-import com.advanced_baseball_stats.v2.exception.InvalidPlayerIdException
-import com.advanced_baseball_stats.v2.exception.InvalidTeamStatsHittingRequest
-import com.advanced_baseball_stats.v2.exception.InvalidTeamStatsPitchingRequest
-import com.advanced_baseball_stats.v2.exception.InvalidUserException
-import com.advanced_baseball_stats.v2.handler.FantasyTeamsHandler
-import com.advanced_baseball_stats.v2.handler.FavoritePlayersHandler
-import com.advanced_baseball_stats.v2.handler.PlayerStatsHandler
-import com.advanced_baseball_stats.v2.handler.TeamStatsHandler
+import com.advanced_baseball_stats.v2.exception.*
+import com.advanced_baseball_stats.v2.handler.*
 import com.advanced_baseball_stats.v2.model.batters.FavoritePlayers.FavoritePlayerInfo
+import com.advanced_baseball_stats.v2.model.users.UserIdentifiers
+
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -32,6 +28,7 @@ fun Application.configureRouting(
     ,   favoritePlayersHandler  : FavoritePlayersHandler
     ,   fantasyTeamsHandler     : FantasyTeamsHandler
     ,   teamStatsHandler        : TeamStatsHandler
+    ,   userHandler             : UserHandler
 ){
     routing {
         get("/")
@@ -47,6 +44,7 @@ fun Application.configureRouting(
 
             val sortBy              = queryParameters["sortBy"          ] ?: "PERCENTILE_OVERALL"
             val position            = queryParameters["position"        ] ?: ""
+            val team                = queryParameters["team"            ] ?: ""
             val startDate           = queryParameters["startDate"       ] ?: ""
             val endDate             = queryParameters["endDate"         ] ?: ""
             val leagueTypeFilter    = queryParameters["leagueTypeFilter"] ?: ""
@@ -64,6 +62,7 @@ fun Application.configureRouting(
             val queryParameters = call.queryParameters
 
             val sortBy              = queryParameters["sortBy"          ] ?: "PERCENTILE_OVERALL"
+            val team                = queryParameters["team"            ] ?: ""
             val startDate           = queryParameters["startDate"       ] ?: ""
             val endDate             = queryParameters["endDate"         ] ?: ""
             val leagueTypeFilter    = queryParameters["leagueTypeFilter"] ?: ""
@@ -81,6 +80,7 @@ fun Application.configureRouting(
             val queryParameters = call.queryParameters
 
             val sortBy              = queryParameters["sortBy"          ] ?: "PERCENTILE_OVERALL"
+            val team                = queryParameters["team"            ] ?: ""
             val startDate           = queryParameters["startDate"       ] ?: ""
             val endDate             = queryParameters["endDate"         ] ?: ""
             val leagueTypeFilter    = queryParameters["leagueTypeFilter"] ?: ""
@@ -98,6 +98,7 @@ fun Application.configureRouting(
             val sortBy              = queryParameters["sortBy"      ]              ?: "PERCENTILE_OVERALL"
             val qualified           = queryParameters["qualified"   ]?.toBoolean() ?: false
             val position            = queryParameters["position"    ]              ?: ""
+            val team                = queryParameters["team"        ]              ?: ""
             val leagueTypeFilter    = queryParameters["leagueType"  ]              ?: ""
             val leagueIdFilter      = queryParameters["leagueId"    ]              ?: ""
             val limit               = queryParameters["limit"       ]?.toInt()     ?: 10
@@ -111,12 +112,13 @@ fun Application.configureRouting(
             val queryParameters = call.queryParameters
 
             val sortBy              = queryParameters["sortBy"      ]              ?: "PERCENTILE_OVERALL"
+            val team                = queryParameters["team"        ]              ?: ""
             val leagueTypeFilter    = queryParameters["leagueType"  ]              ?: ""
             val leagueIdFilter      = queryParameters["leagueId"    ]              ?: ""
             val limit               = queryParameters["limit"       ]?.toInt()     ?: 10
             val page                = queryParameters["page"        ]?.toInt()     ?: 0
 
-            call.respond(playerStatsHandler.getStartingPitcherProjections(sortBy, leagueTypeFilter, leagueIdFilter, limit, page))
+            call.respond(playerStatsHandler.getStartingPitcherProjections(sortBy, team, leagueTypeFilter, leagueIdFilter, limit, page))
         }
 
         get("/api/v2/players/hitting/summary/{playerId}")
@@ -157,7 +159,7 @@ fun Application.configureRouting(
 
             val queryParameters = call.queryParameters
 
-            val startSeason = queryParameters["startSeason"] ?: "2025"
+            val startSeason = queryParameters["startSeason"] ?: "2026"
 
             call.respond(playerStatsHandler.getHitterSeasonSummaries(playerId, startSeason))
         }
@@ -168,7 +170,7 @@ fun Application.configureRouting(
 
             val queryParameters = call.queryParameters
 
-            val startSeason = queryParameters["startSeason"] ?: "2025"
+            val startSeason = queryParameters["startSeason"] ?: "2026"
 
             call.respond(playerStatsHandler.getPitcherSeasonSummaries(playerId, startSeason))
         }
@@ -191,14 +193,17 @@ fun Application.configureRouting(
             call.respond(playerStatsHandler.getPitchingStatPerGame(playerId, season, stat))
         }
 
-        get("/api/v2/teams/hitting/stats/{teamId}/{season}")
+        get("/api/v2/teams/hitting/stats/{season}")
         {
-            val teamId: String  = call.parameters["teamId"].toString()
-            val season: Int     = call.parameters["season"]?.toInt() ?: 2026
+            val season: Int = call.parameters["season"]?.toInt() ?: 2026
+
+            val queryParameters = call.queryParameters
+
+            val sortBy = queryParameters["sortBy"] ?: ""
 
             try
             {
-                call.respond(teamStatsHandler.getTeamHittingStatsPerSeason(teamId, season))
+                call.respond(teamStatsHandler.getTeamsHittingStatsPerSeason(season, sortBy))
             }
             catch (ex: InvalidTeamStatsHittingRequest)
             {
@@ -206,18 +211,34 @@ fun Application.configureRouting(
             }
         }
 
-        get("/api/v2/teams/pitching/stats/{teamId}/{season}")
+        get("/api/v2/teams/pitching/stats/{season}")
         {
-            val teamId: String  = call.parameters["teamId"].toString()
-            val season: Int     = call.parameters["season"]?.toInt() ?: 2026
+            val season: Int = call.parameters["season"]?.toInt() ?: 2026
 
             try
             {
-                call.respond(teamStatsHandler.getTeamPitchingStatsPerSeason(teamId, season))
+                call.respond(teamStatsHandler.getTeamsPitchingStatsPerSeason(season))
             }
             catch (ex: InvalidTeamStatsPitchingRequest)
             {
                 call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+        }
+
+        get("/api/v2/teams/summary/{team}/{season}")
+        {
+            val team: String    = call.parameters["team"    ]           ?: ""
+            val season: Int     = call.parameters["season"  ]?.toInt()  ?: 2026
+
+            val teamSummary = teamStatsHandler.getTeamSummary(team, season)
+
+            if (teamSummary != null)
+            {
+                call.respond(teamSummary)
+            }
+            else
+            {
+                call.respond(HttpStatusCode.BadRequest)
             }
         }
 
@@ -277,6 +298,55 @@ fun Application.configureRouting(
             val weekNumber = queryParameters["weekNumber"]?.toInt() ?: 1
 
             call.respond(fantasyTeamsHandler.getFantasyTeamSummary(userId, leagueType, leagueId, teamId, weekNumber))
+        }
+
+        get("/api/v2/users/getOptimizedLineup/{userId}/{leagueType}/{leagueId}/{teamId}")
+        {
+            val userId      : String = call.parameters["userId"     ].toString()
+            val leagueType  : String = call.parameters["leagueType" ].toString()
+            val leagueId    : String = call.parameters["leagueId"   ].toString()
+            val teamId      : String = call.parameters["teamId"     ].toString()
+
+            call.respond(fantasyTeamsHandler.getOptimizedLineup(userId, leagueType, leagueId, teamId))
+        }
+
+        post("/api/v2/users/createUser")
+        {
+            val userInfo = call.receive<UserIdentifiers>()
+
+            try
+            {
+                userHandler.createUser(userInfo)
+
+                call.respond(HttpStatusCode.Created)
+            }
+            catch (ex: DuplicateEmailException)
+            {
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "invalid input")
+            }
+        }
+
+        post("/api/v2/users/validateUser")
+        {
+            val userInfo = call.receive<UserIdentifiers>()
+
+            try
+            {
+                val userId = userHandler.validateUser(userInfo)
+
+                if (userId != null)
+                {
+                    call.respond(userId)
+                }
+                else
+                {
+                    call.respond(HttpStatusCode.Unauthorized, "Incorrect password")
+                }
+            }
+            catch(ex: InvalidEmailException)
+            {
+                call.respond(HttpStatusCode.Unauthorized, ex.message ?: "Email does not exist")
+            }
         }
 
         get("/schedule/{team}/{startDate}/{endDate}")

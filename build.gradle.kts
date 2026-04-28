@@ -51,6 +51,8 @@ dependencies {
 
     implementation("redis.clients:jedis:6.0.0")
 
+    implementation("org.mindrot:jbcrypt:0.4")
+
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.core)
