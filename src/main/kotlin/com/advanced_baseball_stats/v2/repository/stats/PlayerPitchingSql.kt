@@ -137,7 +137,8 @@ object PlayerPitchingSql
                 SeasonStatsPitchingTable.strikeOutPercentage,
                 SeasonStatsPitchingTable.walkPercentage,
                 SeasonStatsPitchingTable.strikeOutWalkDifference,
-                SeasonStatsPitchingTable.homeRunPerFlyBallPercentage
+                SeasonStatsPitchingTable.homeRunPerFlyBallPercentage,
+                SeasonStatsPitchingTable.fip
             )
             .where { (SeasonStatsPitchingTable.season greaterEq startSeason.toInt()) and (SeasonStatsPitchingTable.playerId eq playerId) }
             .orderBy(SeasonStatsPitchingTable.season.desc())
@@ -185,13 +186,14 @@ object PlayerPitchingSql
                 val walkPercentage               = seasonRow[SeasonStatsPitchingTable.walkPercentage] ?: 0.0
                 val strikeOutWalkDifference      = seasonRow[SeasonStatsPitchingTable.strikeOutWalkDifference] ?: 0.0
                 val homeRunPerFlyBallPercentage  = seasonRow[SeasonStatsPitchingTable.homeRunPerFlyBallPercentage] ?: 0.0
+                val fip                          = seasonRow[SeasonStatsPitchingTable.fip] ?: 0.0
 
                 seasonSummaries.add(PitcherSeasonSummary(season, teams, ipOuts, battersFaced, hits, homeRuns, runs, earnedRuns, walks,
                     intentionalWalks, strikeOuts, hitByPitch, wildPitches, balks, stolenBases, caughtStealing, passedBalls, wins, losses,
                     saves, holds, qualityStarts, gamesStarted, era, whip, ksPerNine, walksPerNine, homeRunsPerNine, averageFastballVelocity,
                     averageExitVelocity, zonePercentage, chasePercentage, swingingStrikePercentage, hardHitPercentage, barrelPercentage,
                     groundBallPercentage, flyBallPercentage, lineDrivePercentage, popUpPercentage, strikeOutPercentage, walkPercentage,
-                    strikeOutWalkDifference, homeRunPerFlyBallPercentage))
+                    strikeOutWalkDifference, homeRunPerFlyBallPercentage, fip))
             }
         return seasonSummaries
     }

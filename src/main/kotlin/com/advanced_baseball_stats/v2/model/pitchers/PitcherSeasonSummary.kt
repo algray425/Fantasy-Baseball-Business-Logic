@@ -46,6 +46,7 @@ class PitcherSeasonSummary(
     val strikeOutPercentage: Double,
     val walkPercentage: Double,
     val strikeOutWalkDifference: Double,
-    val homeRunPerFlyBallPercentage: Double
+    val homeRunPerFlyBallPercentage: Double,
+    val fip: Double,
 ) {
 }

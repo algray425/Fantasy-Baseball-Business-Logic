@@ -60,4 +60,5 @@ object SeasonStatsPitchingTable : Table<Nothing>("SeasonStatsPitching")
     val walkPercentage = double("walkPercentage")
     val strikeOutWalkDifference = double("strikeOutWalkDifference")
     val homeRunPerFlyBallPercentage = registerColumn("homeRunPerFlyBallPercentage", SafeRealSqlType)
+    val fip = registerColumn("fip", SafeRealSqlType)
 }
