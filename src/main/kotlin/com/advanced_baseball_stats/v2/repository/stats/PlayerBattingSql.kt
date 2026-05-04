@@ -485,7 +485,7 @@ object PlayerBattingSql
                 val lastName                = playerRow[BiosTable.lastName] ?: ""
                 val currentPosition         = playerRow[BiosTable.currentPosition] ?: ""
                 val currentTeam             = playerRow[BiosTable.currentTeam] ?: ""
-                val overallPercentile       = playerRow[SeasonGradesStartingPitchersTable.percentileOverall] ?: 0.0
+                val overallPercentile       = playerRow[SeasonGradesStartingPitchersTable.percentileOverall]
                 val qualifiedPercentile     = playerRow[SeasonGradesStartingPitchersTable.percentileOverallQualified] ?: 0.0
                 val percentileQualityStarts = playerRow[SeasonGradesStartingPitchersTable.percentileQualityStarts] ?: 0.0
                 val percentileEra           = playerRow[SeasonGradesStartingPitchersTable.percentileEra] ?: 0.0
@@ -496,9 +496,11 @@ object PlayerBattingSql
                 val whip                    = playerRow[SeasonStatsPitchingTable.whip] ?: 0.0
                 val ksPerNine               = playerRow[SeasonStatsPitchingTable.ksPerNine] ?: 0.0
 
-
-                playerSummaries.add(FantasyPlayerSummaryStartingPitching(playerId, firstName, lastName, currentPosition, currentTeam, overallPercentile,
-                    qualifiedPercentile, percentileQualityStarts, percentileEra, percentileWhip, percentileKsPerNine, qualityStarts, era, whip, ksPerNine))
+                if (overallPercentile != null)
+                {
+                    playerSummaries.add(FantasyPlayerSummaryStartingPitching(playerId, firstName, lastName, currentPosition, currentTeam, overallPercentile,
+                        qualifiedPercentile, percentileQualityStarts, percentileEra, percentileWhip, percentileKsPerNine, qualityStarts, era, whip, ksPerNine))
+                }
             }
 
         DatabaseConnection.database.from(BiosTable)
@@ -518,7 +520,7 @@ object PlayerBattingSql
                 val lastName                        = playerRow[BiosTable.lastName] ?: ""
                 val currentPosition                 = playerRow[BiosTable.currentPosition] ?: ""
                 val currentTeam                     = playerRow[BiosTable.currentTeam] ?: ""
-                val overallPercentile               = playerRow[SeasonGradesReliefPitchersTable.percentileOverall] ?: 0.0
+                val overallPercentile               = playerRow[SeasonGradesReliefPitchersTable.percentileOverall]
                 val qualifiedPercentile             = playerRow[SeasonGradesReliefPitchersTable.overallGradeQualified] ?: 0.0
                 val overallPercentileSavesAndHolds  = playerRow[SeasonGradesReliefPitchersTable.percentileSavesAndHolds] ?: 0.0
                 val overallPercentileEra            = playerRow[SeasonGradesReliefPitchersTable.percentileEra] ?: 0.0
@@ -530,9 +532,12 @@ object PlayerBattingSql
                 val saves                           = playerRow[SeasonStatsPitchingTable.saves] ?: 0
                 val holds                           = playerRow[SeasonStatsPitchingTable.holds] ?: 0
 
-                playerSummaries.add(FantasyPlayerSummaryReliefPitching(playerId, firstName, lastName, currentPosition, currentTeam, overallPercentile,
+                if (overallPercentile != null)
+                {
+                    playerSummaries.add(FantasyPlayerSummaryReliefPitching(playerId, firstName, lastName, currentPosition, currentTeam, overallPercentile,
                         qualifiedPercentile, overallPercentileSavesAndHolds, overallPercentileEra, overallPercentileWhip, overallPercentileKsPerNine,
                         saves, holds, era, whip, ksPerNine))
+                }
             }
 
         return playerSummaries
