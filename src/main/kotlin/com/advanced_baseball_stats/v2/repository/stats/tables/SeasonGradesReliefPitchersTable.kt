@@ -18,6 +18,7 @@ object SeasonGradesReliefPitchersTable : Table<Nothing>("SeasonGradesReliefPitch
     val qualifiedPercentileKsPerNine = double("qualifiedPercentileKsPerNine")
     val percentileSavesAndHolds = double("percentileSavesAndHolds")
     val qualifiedPercentileSavesAndHolds = double("qualifiedPercentileSavesAndHolds")
+    val percentileFip = double("percentileFip")
     val percentileOverall = double("percentileOverall")
     val percentileOverallQualified = double("percentileOverallQualified")
     val overallGrade = double("overallGrade")

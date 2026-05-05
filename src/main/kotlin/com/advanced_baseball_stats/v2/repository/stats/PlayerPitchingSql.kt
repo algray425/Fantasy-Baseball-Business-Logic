@@ -69,8 +69,14 @@ object PlayerPitchingSql
         var pitcherSummary: PitcherSummary? = null
 
         DatabaseConnection.database.from(BiosTable)
+            .leftJoin(SeasonGradesStartingPitchersTable, on = (SeasonGradesStartingPitchersTable.playerId eq BiosTable.playerId) and (SeasonGradesStartingPitchersTable.season eq 2026))
+            .leftJoin(SeasonGradesReliefPitchersTable, on = (SeasonGradesReliefPitchersTable.playerId eq BiosTable.playerId) and (SeasonGradesReliefPitchersTable.season eq 2026))
             .select(BiosTable.firstName, BiosTable.lastName, BiosTable.dob, BiosTable.batSide, BiosTable.throwHand,
-                BiosTable.height, BiosTable.weight, BiosTable.currentTeam)
+                BiosTable.height, BiosTable.weight, BiosTable.currentTeam, SeasonGradesStartingPitchersTable.percentileEra, SeasonGradesStartingPitchersTable.percentileWhip,
+                SeasonGradesStartingPitchersTable.percentileKsPerNine, SeasonGradesStartingPitchersTable.percentileQualityStarts,
+                SeasonGradesStartingPitchersTable.percentileFip, SeasonGradesStartingPitchersTable.percentileOverall,
+                SeasonGradesReliefPitchersTable.percentileEra, SeasonGradesReliefPitchersTable.percentileWhip, SeasonGradesReliefPitchersTable.percentileKsPerNine,
+                SeasonGradesReliefPitchersTable.percentileSavesAndHolds, SeasonGradesReliefPitchersTable.percentileFip, SeasonGradesReliefPitchersTable.percentileOverall)
             .where{ BiosTable.playerId eq playerId }
             .limit(1)
             .forEach { playerRow ->
@@ -83,8 +89,36 @@ object PlayerPitchingSql
                 val weight                          = playerRow[BiosTable.weight] ?: 0.0
                 val currentTeam                     = playerRow[BiosTable.currentTeam] ?: ""
 
+                var percentileEra           : Double? = null
+                var percentileWhip          : Double? = null
+                var percentileKsPerNine     : Double? = null
+                var percentileQualityStarts : Double? = null
+                var percentileSavesAndHolds : Double? = null
+                var percentileFip           : Double? = null
+                var percentileOverall       : Double? = null
+
+                if (playerRow[SeasonGradesStartingPitchersTable.percentileOverall] != null)
+                {
+                    percentileEra           = playerRow[SeasonGradesStartingPitchersTable.percentileEra]
+                    percentileWhip          = playerRow[SeasonGradesStartingPitchersTable.percentileWhip]
+                    percentileKsPerNine     = playerRow[SeasonGradesStartingPitchersTable.percentileKsPerNine]
+                    percentileQualityStarts = playerRow[SeasonGradesStartingPitchersTable.percentileQualityStarts]
+                    percentileFip           = playerRow[SeasonGradesStartingPitchersTable.percentileFip]
+                    percentileOverall       = playerRow[SeasonGradesStartingPitchersTable.percentileOverall]
+                }
+                if (playerRow[SeasonGradesReliefPitchersTable.percentileOverall] != null)
+                {
+                    percentileEra           = playerRow[SeasonGradesReliefPitchersTable.percentileEra]
+                    percentileWhip          = playerRow[SeasonGradesReliefPitchersTable.percentileWhip]
+                    percentileKsPerNine     = playerRow[SeasonGradesReliefPitchersTable.percentileKsPerNine]
+                    percentileSavesAndHolds = playerRow[SeasonGradesReliefPitchersTable.percentileSavesAndHolds]
+                    percentileFip           = playerRow[SeasonGradesReliefPitchersTable.percentileFip]
+                    percentileOverall       = playerRow[SeasonGradesReliefPitchersTable.percentileOverall]
+                }
+
                 pitcherSummary = PitcherSummary(playerId, firstName, lastName, AgeHelper.calculateAgeFromTimestamp(dob),
-                    batSide, throwHand, height, weight, currentTeam)
+                    batSide, throwHand, height, weight, currentTeam, percentileEra, percentileWhip, percentileKsPerNine,
+                    percentileQualityStarts, percentileSavesAndHolds, percentileFip, percentileOverall)
             }
         return pitcherSummary
     }

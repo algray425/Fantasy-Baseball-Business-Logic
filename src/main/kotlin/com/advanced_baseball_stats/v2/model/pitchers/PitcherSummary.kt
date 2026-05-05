@@ -15,6 +15,13 @@ class PitcherSummary(
     val height: String,
     val weight: Double,
     val currentTeam: String,
+    val percentileEra: Double?,
+    val percentileWhip: Double?,
+    val percentileKsPerNine: Double?,
+    val percentileQualityStarts: Double?,
+    val percentileSavesAndHolds: Double?,
+    val percentileFip: Double?,
+    val percentileOverall: Double?,
     val upcomingSchedule: MutableList<PitcherGame> = mutableListOf()
 ) {
     fun addGame(game: PitcherGame)
