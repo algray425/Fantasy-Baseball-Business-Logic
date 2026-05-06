@@ -19,6 +19,8 @@ object SeasonGradesStartingPitchersTable : Table<Nothing>("SeasonGradesStartingP
     val percentileQualityStarts = double("percentileQualityStarts")
     val qualifiedPercentileQualityStarts = double("qualifiedPercentileQualityStarts")
     val percentileFip = double("percentileFip")
+    val percentileStrikeOutWalkDifference = double("percentileStrikeOutWalkDifference")
+    val percentileCsw = double("percentileCsw")
     val percentileOverall = double("percentileOverall")
     val percentileOverallQualified = double("percentileOverallQualified")
     val overallGrade = double("overallGrade")
