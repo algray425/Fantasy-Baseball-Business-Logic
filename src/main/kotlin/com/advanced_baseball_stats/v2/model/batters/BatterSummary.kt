@@ -33,6 +33,11 @@ class BatterSummary(
     val qualifiedPercentilePredictedStolenBases: Double,
     val qualifiedPercentilePredictedObp: Double,
     val qualifiedPercentilePredictedGrade: Double,
+    val hardHitPercentile: Double,
+    val barrelPercentile: Double,
+    val babipPercentile: Double,
+    val spdPercentile: Double,
+
     val upcomingSchedule: MutableList<HitterGame> = mutableListOf()
 ) {
     fun addGame(game: HitterGame)

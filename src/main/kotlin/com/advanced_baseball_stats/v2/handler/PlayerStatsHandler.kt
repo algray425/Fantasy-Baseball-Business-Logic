@@ -265,7 +265,7 @@ class PlayerStatsHandler
 
     fun getHitterSummary(playerId: String): BatterSummary?
     {
-        val playerSummary = PlayerBattingSql.getPlayerSummary(playerId)
+        val playerSummary = PlayerBattingSql.getPlayerSummary(playerId, 2026)
 
         if (playerSummary != null && playerSummary.currentTeam.isNotEmpty())
         {

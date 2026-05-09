@@ -285,12 +285,13 @@ object PlayerBattingSql
             return projections
         }
 
-    fun getPlayerSummary(playerId: String): BatterSummary?
+    fun getPlayerSummary(playerId: String, season: Int): BatterSummary?
     {
         var batterSummary: BatterSummary? = null
 
         DatabaseConnection.database.from(BiosTable)
             .leftJoin(HitterProjectionsTable, on = BiosTable.playerId eq HitterProjectionsTable.playerId)
+            .leftJoin(SeasonGradesTable, on = (BiosTable.playerId eq SeasonGradesTable.playerId) and (SeasonGradesTable.season eq season))
             .select(
                 BiosTable.playerId, BiosTable.firstName, BiosTable.lastName, BiosTable.dob, BiosTable.batSide, BiosTable.throwHand,
                 BiosTable.height, BiosTable.weight,
@@ -298,7 +299,9 @@ object PlayerBattingSql
                 HitterProjectionsTable.onBasePercentage, HitterProjectionsTable.overallPercentileRuns, HitterProjectionsTable.overallPercentileHomeRuns, HitterProjectionsTable.overallPercentileRbis,
                 HitterProjectionsTable.overallPercentileStolenBases, HitterProjectionsTable.overallPercentileObp, HitterProjectionsTable.overallGradePercentile, HitterProjectionsTable.qualifiedPercentileRuns,
                 HitterProjectionsTable.qualifiedPercentileHomeRuns, HitterProjectionsTable.qualifiedPercentileRbis, HitterProjectionsTable.qualifiedPercentileStolenBases,
-                HitterProjectionsTable.qualifiedPercentileObp, HitterProjectionsTable.qualifiedGradePercentile)
+                HitterProjectionsTable.qualifiedPercentileObp, HitterProjectionsTable.qualifiedGradePercentile, SeasonGradesTable.percentileRuns, SeasonGradesTable.percentileHomeRuns,
+                SeasonGradesTable.percentileRbis, SeasonGradesTable.percentileStolenBases, SeasonGradesTable.percentileOnBasePercentage, SeasonGradesTable.hardHitPercentile,
+                SeasonGradesTable.barrelPercentile, SeasonGradesTable.babipPercentile, SeasonGradesTable.spdPercentile)
             .where { BiosTable.playerId eq playerId }
             .limit(1)
             .forEach { playerRow ->
@@ -329,11 +332,15 @@ object PlayerBattingSql
                 val qualifiedPercentileStolenBases  = playerRow[HitterProjectionsTable.qualifiedPercentileStolenBases] ?: 0.0
                 val qualifiedPercentileObp          = playerRow[HitterProjectionsTable.qualifiedPercentileObp] ?: 0.0
                 val qualifiedGradePercentile        = playerRow[HitterProjectionsTable.qualifiedGradePercentile] ?: 0.0
+                val hardHitPercentile               = playerRow[SeasonGradesTable.hardHitPercentile] ?: 0.0
+                val barrelPercentile                = playerRow[SeasonGradesTable.barrelPercentile] ?: 0.0
+                val babipPercentile                 = playerRow[SeasonGradesTable.babipPercentile] ?: 0.0
+                val spdPercentile                   = playerRow[SeasonGradesTable.spdPercentile] ?: 0.0
 
                 batterSummary = BatterSummary(playerId, firstName, lastName, AgeHelper.calculateAgeFromTimestamp(dob), batSide, throwHand, height, weight, currentTeam, currentPosition, runs, homeRuns,
                     rbis, stolenBases, onBasePercentage, overallPercentileRuns, overallPercentileHomeRuns, overallPercentileRbis, overallPercentileStolenBases,
                     overallPercentileObp, overallGradePercentile, qualifiedPercentileRuns, qualifiedPercentileHomeRuns, qualifiedPercentileRbis, qualifiedPercentileStolenBases,
-                    qualifiedPercentileObp, qualifiedGradePercentile)
+                    qualifiedPercentileObp, qualifiedGradePercentile, hardHitPercentile, barrelPercentile, babipPercentile, spdPercentile)
             }
 
         return batterSummary
