@@ -301,7 +301,7 @@ object PlayerBattingSql
                 HitterProjectionsTable.qualifiedPercentileHomeRuns, HitterProjectionsTable.qualifiedPercentileRbis, HitterProjectionsTable.qualifiedPercentileStolenBases,
                 HitterProjectionsTable.qualifiedPercentileObp, HitterProjectionsTable.qualifiedGradePercentile, SeasonGradesTable.percentileRuns, SeasonGradesTable.percentileHomeRuns,
                 SeasonGradesTable.percentileRbis, SeasonGradesTable.percentileStolenBases, SeasonGradesTable.percentileOnBasePercentage, SeasonGradesTable.hardHitPercentile,
-                SeasonGradesTable.barrelPercentile, SeasonGradesTable.babipPercentile, SeasonGradesTable.spdPercentile)
+                SeasonGradesTable.barrelPercentile, SeasonGradesTable.babipPercentile, SeasonGradesTable.spdPercentile, SeasonGradesTable.laSweetSpotPercentile)
             .where { BiosTable.playerId eq playerId }
             .limit(1)
             .forEach { playerRow ->
@@ -336,11 +336,12 @@ object PlayerBattingSql
                 val barrelPercentile                = playerRow[SeasonGradesTable.barrelPercentile] ?: 0.0
                 val babipPercentile                 = playerRow[SeasonGradesTable.babipPercentile] ?: 0.0
                 val spdPercentile                   = playerRow[SeasonGradesTable.spdPercentile] ?: 0.0
+                val laSweetSpotPercentile           = playerRow[SeasonGradesTable.laSweetSpotPercentile] ?: 0.0
 
                 batterSummary = BatterSummary(playerId, firstName, lastName, AgeHelper.calculateAgeFromTimestamp(dob), batSide, throwHand, height, weight, currentTeam, currentPosition, runs, homeRuns,
                     rbis, stolenBases, onBasePercentage, overallPercentileRuns, overallPercentileHomeRuns, overallPercentileRbis, overallPercentileStolenBases,
                     overallPercentileObp, overallGradePercentile, qualifiedPercentileRuns, qualifiedPercentileHomeRuns, qualifiedPercentileRbis, qualifiedPercentileStolenBases,
-                    qualifiedPercentileObp, qualifiedGradePercentile, hardHitPercentile, barrelPercentile, babipPercentile, spdPercentile)
+                    qualifiedPercentileObp, qualifiedGradePercentile, hardHitPercentile, barrelPercentile, babipPercentile, spdPercentile, laSweetSpotPercentile)
             }
 
         return batterSummary
@@ -375,7 +376,8 @@ object PlayerBattingSql
                 SeasonStatsHittingTable.lineDrivePercentage,
                 SeasonStatsHittingTable.popUpPercentage,
                 SeasonStatsHittingTable.hardHitPercentage,
-                SeasonStatsHittingTable.barrelPercentage)
+                SeasonStatsHittingTable.barrelPercentage,
+                SeasonStatsHittingTable.laSweetSpotPercentage)
             .where{ (SeasonStatsHittingTable.season greaterEq startSeason.toInt()) and (SeasonStatsHittingTable.playerId eq playerId) }
             .orderBy(SeasonStatsHittingTable.season.desc())
             .forEach { seasonRow ->
@@ -404,10 +406,11 @@ object PlayerBattingSql
                 val popUpPercentage         = seasonRow[SeasonStatsHittingTable.popUpPercentage]?: -1.0
                 val hardHitPercentage       = seasonRow[SeasonStatsHittingTable.hardHitPercentage]?: -1.0
                 val barrelPercentage        = seasonRow[SeasonStatsHittingTable.barrelPercentage]?: -1.0
+                val laSweetSpotPercentage   = seasonRow[SeasonStatsHittingTable.laSweetSpotPercentage]?: -1.0
 
                 seasonSummaries.add(BatterSeasonSummary(season, teams, plateAppearances, atBats, runs, hits, doubles, triples, homeRuns, rbis, walks,
                     strikeOuts, stolenBases, battingAverage, onBasePercentage, sluggingPercentage, onBasePlusSlugging, babip,
-                    spd, groundBallPercentage, flyBallPercentage, lineDrivePercentage, popUpPercentage, hardHitPercentage, barrelPercentage))
+                    spd, groundBallPercentage, flyBallPercentage, lineDrivePercentage, popUpPercentage, hardHitPercentage, barrelPercentage, laSweetSpotPercentage))
             }
 
         return seasonSummaries

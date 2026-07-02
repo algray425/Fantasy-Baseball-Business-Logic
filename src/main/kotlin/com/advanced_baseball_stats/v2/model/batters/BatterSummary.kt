@@ -37,6 +37,7 @@ class BatterSummary(
     val barrelPercentile: Double,
     val babipPercentile: Double,
     val spdPercentile: Double,
+    val laSweetSpotPercentile: Double,
 
     val upcomingSchedule: MutableList<HitterGame> = mutableListOf()
 ) {

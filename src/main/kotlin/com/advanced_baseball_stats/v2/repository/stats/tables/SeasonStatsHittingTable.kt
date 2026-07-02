@@ -44,4 +44,5 @@ object SeasonStatsHittingTable : Table<Nothing>("SeasonStatsHitting")
     val popUpPercentage = double("popUpPercentage")
     val hardHitPercentage = double("hardHitPercentage")
     val barrelPercentage = double("barrelPercentage")
+    val laSweetSpotPercentage = double("laSweetSpotPercentage")
 }

@@ -29,5 +29,6 @@ class BatterSeasonSummary(
     val popUpPercentage: Double,
     val hardHitPercentage: Double,
     val barrelPercentage: Double,
+    val laSweetSpotPercentage: Double
 ){
 }
