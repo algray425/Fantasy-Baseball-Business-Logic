@@ -29,11 +29,19 @@ fun Application.configureRouting(
     ,   fantasyTeamsHandler     : FantasyTeamsHandler
     ,   teamStatsHandler        : TeamStatsHandler
     ,   userHandler             : UserHandler
+    ,   playerSearchHandler     : PlayerSearchHandler
 ){
     routing {
         get("/")
         {
             call.respond("Hello World!")
+        }
+
+        get("/api/v2/players/{searchQuery}")
+        {
+            val searchQuery: String = call.parameters["searchQuery"] ?: ""
+
+            call.respond(playerSearchHandler.getPlayersFromSearchQuery(searchQuery))
         }
 
         get("/api/v2/players/hitting/stats/{season}")

@@ -43,8 +43,9 @@ fun Application.module()
     val fantasyTeamsHandler     = FantasyTeamsHandler()
     val teamStatsHandler        = TeamStatsHandler()
     val userHandler             = UserHandler()
+    val playerSearchHandler     = PlayerSearchHandler()
 
     configureSerialization  ()
     configureCors           ()
-    configureRouting        (battingStatHandler, pitchingStatHandler, gradeHandler, playerStatsHandler, favoritePlayersHandler, fantasyTeamsHandler, teamStatsHandler, userHandler)
+    configureRouting        (battingStatHandler, pitchingStatHandler, gradeHandler, playerStatsHandler, favoritePlayersHandler, fantasyTeamsHandler, teamStatsHandler, userHandler, playerSearchHandler)
 }
