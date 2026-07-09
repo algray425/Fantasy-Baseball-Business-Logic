@@ -38,7 +38,7 @@ object PlayerSql
 
         DatabaseConnection.database.from(SeasonStatsPitchingTable)
             .innerJoin(BiosTable, on = SeasonStatsPitchingTable.playerId eq BiosTable.playerId)
-            .select(BiosTable.firstName, BiosTable.lastName, BiosTable.currentPosition, BiosTable.currentTeam)
+            .select(BiosTable.firstName, BiosTable.lastName, BiosTable.playerId, BiosTable.currentPosition, BiosTable.currentTeam)
             .where(SeasonStatsPitchingTable.season eq season)
             .forEach { batterRow ->
                 val firstName       = batterRow[BiosTable.firstName         ] ?: ""
