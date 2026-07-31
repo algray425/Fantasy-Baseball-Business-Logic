@@ -23,24 +23,29 @@ object TeamPitchingSql
         return null
     }
 
-    fun getPitchingGradesByPitcher(pitchers: Set<String>, season: Int): Map<String, Pair<Double,Double>>
+    fun getPitchingGradesByPitcher(teams: Set<String>, pitchers: Set<String>, season: Int): Map<String, Pair<Double,Pair<String,Double>>>
     {
-        val teamToMatchupGrades = mutableMapOf<String, Pair<Double, Double>>()
+        val teamToMatchupGrades = mutableMapOf<String, Pair<Double, Pair<String, Double>>>()
 
-        DatabaseConnection.database.from(BiosTable)
-            .leftJoin(SeasonGradesTeamPitchingTable, on = (SeasonGradesTeamPitchingTable.team eq BiosTable.currentTeam) and (SeasonGradesTeamPitchingTable.season eq season))
+        DatabaseConnection.database.from(SeasonGradesTeamPitchingTable)
+            .leftJoin(BiosTable, on = (BiosTable.currentTeam eq SeasonGradesTeamPitchingTable.team) and (BiosTable.playerId inList pitchers))
             .leftJoin(SeasonGradesStartingPitchersTable, on = (SeasonGradesStartingPitchersTable.playerId eq BiosTable.playerId) and (SeasonGradesStartingPitchersTable.season eq season))
-            .select(SeasonGradesTeamPitchingTable.team, SeasonGradesTeamPitchingTable.percentileOverall, SeasonGradesStartingPitchersTable.percentileOverall)
-            .where{BiosTable.playerId inList pitchers}
+            .select(SeasonGradesTeamPitchingTable.team, SeasonGradesTeamPitchingTable.percentileOverall, BiosTable.firstName, BiosTable.lastName, SeasonGradesStartingPitchersTable.percentileOverall)
+            .where{ (SeasonGradesTeamPitchingTable.team inList teams) and (SeasonGradesTeamPitchingTable.season eq season) }
             .forEach { teamRow ->
                 val team                = teamRow[SeasonGradesTeamPitchingTable.team] ?: ""
                 val teamPercentile      = teamRow[SeasonGradesTeamPitchingTable.percentileOverall] ?: 0.0
+                val firstName           = teamRow[BiosTable.firstName] ?: ""
+                val lastName            = teamRow[BiosTable.lastName ] ?: ""
                 val pitcherPercentile   = teamRow[SeasonGradesStartingPitchersTable.percentileOverall] ?: 50.0
 
                 if (team.isNotEmpty())
                 {
                     val inversePitcherPercentile = 100.0 - pitcherPercentile
-                    teamToMatchupGrades[team] = Pair(teamPercentile, inversePitcherPercentile)
+
+                    val fullName = if (firstName.isNotEmpty() && lastName.isNotEmpty()) "$firstName $lastName" else "unknown"
+
+                    teamToMatchupGrades[team] = Pair(teamPercentile, Pair(fullName, inversePitcherPercentile))
                 }
             }
         return teamToMatchupGrades

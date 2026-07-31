@@ -157,13 +157,13 @@ class FantasyTeamsHandler
             }
         }
 
-        val currentDate = LocalDate.now()
-        val prevWeekDate = currentDate.minusWeeks(1)
+        val currentDate     = LocalDate.now()
+        val prevWeekDate    = currentDate.minusWeeks(1)
 
         val schedule: Schedule?
 
         runBlocking {
-            schedule = mlbApiSource.getSchedulePerDateRange(prevWeekDate.toString(), currentDate.toString())
+            schedule = mlbApiSource.getSchedulePerDateRange(currentDate.toString(), currentDate.toString())
         }
 
         if (fantasyRosters != null && schedule != null)
@@ -193,6 +193,8 @@ class FantasyTeamsHandler
             val teamToOpp           = mutableMapOf<String, String>()
             val opposingPitchers    = mutableSetOf<String>()
 
+            val opposingTeams = mutableSetOf<String>()
+
             for (date in schedule.dates)
             {
                 for (game in date.games)
@@ -200,21 +202,26 @@ class FantasyTeamsHandler
                     val awayTeamAbbr = MlbTeamIdToAbbreviationTransformer.transform(game.teams.awayTeam.team.id)
                     val homeTeamAbbr = MlbTeamIdToAbbreviationTransformer.transform(game.teams.homeTeam.team.id)
 
-                    if (teams.contains(awayTeamAbbr) && game.teams.homeTeam.probablePitcher != null)
+                    teamToOpp[awayTeamAbbr] = homeTeamAbbr
+                    teamToOpp[homeTeamAbbr] = awayTeamAbbr
+
+                    if (teams.contains(awayTeamAbbr))
                     {
-                        opposingPitchers.add(game.teams.homeTeam.probablePitcher.id.toString())
-                        teamToOpp[awayTeamAbbr] = homeTeamAbbr
+                        if (game.teams.homeTeam.probablePitcher != null) opposingPitchers.add(game.teams.homeTeam.probablePitcher.id.toString())
+
+                        opposingTeams.add(homeTeamAbbr)
                     }
-                    if (teams.contains(homeTeamAbbr)  && game.teams.awayTeam.probablePitcher != null)
+                    if (teams.contains(homeTeamAbbr))
                     {
-                        opposingPitchers.add(game.teams.awayTeam.probablePitcher.id.toString())
-                        teamToOpp[homeTeamAbbr] = awayTeamAbbr
+                        if (game.teams.awayTeam.probablePitcher != null) opposingPitchers.add(game.teams.awayTeam.probablePitcher.id.toString())
+
+                        opposingTeams.add(awayTeamAbbr)
                     }
                 }
             }
 
             //get pitching matchup grades and probable pitcher grades from database
-            val matchupGrades = TeamPitchingSql.getPitchingGradesByPitcher(opposingPitchers, 2026)
+            val matchupGrades: Map<String, Pair<Double, Pair<String, Double>>> = TeamPitchingSql.getPitchingGradesByPitcher(opposingTeams, opposingPitchers, 2026)
 
             //map of position to priority queues sorted by grade (overall grade + grade last 7 days + inverse pitcher grade + matchup grade / 4)
             val positionToHitterRankings = mutableMapOf<String, PriorityQueue<Pair<LineupOptimizedHitter, Double>>>()
@@ -225,16 +232,25 @@ class FantasyTeamsHandler
                 val hitterPercentileOverall = hitter.percentileOverall
 
                 val hitterOpposingTeam  = teamToOpp[hitter.currentTeam] ?: ""
-                val hitterMatchupGrades = matchupGrades[hitterOpposingTeam] ?: Pair(0.0, 0.0)
+                val hitterMatchupGrades = matchupGrades[hitterOpposingTeam] ?: Pair(0.0, Pair("", 0.0))
 
                 val matchupGradeOverall = hitterMatchupGrades.first
                 val matchupGradePitcher = hitterMatchupGrades.second
 
-                val gradeAverage = (hitterPercentileTeam + hitterPercentileOverall + matchupGradeOverall + matchupGradePitcher) / 4.0
+                val gradeAverage = (hitterPercentileTeam + hitterPercentileOverall + matchupGradeOverall + matchupGradePitcher.second) / 4.0
 
                 val position = hitter.currentPosition
 
-                if (position.equals("1B"))
+                if (hitterOpposingTeam.isNotEmpty())
+                {
+                    hitter.opposingTeamId           = hitterOpposingTeam
+                    hitter.opposingTeamMatchupGrade = matchupGradeOverall
+                }
+
+                hitter.opposingPitcherName          = matchupGradePitcher.first
+                hitter.opposingPitcherMatchupGrade  = matchupGradePitcher.second
+
+                if (position.equals("1B") && hitterOpposingTeam.isNotEmpty())
                 {
                     if (!positionToHitterRankings.containsKey("1B"))
                     {
@@ -248,7 +264,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["1B"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["1B/3B"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("C"))
+                else if (position.equals("C") && hitterOpposingTeam.isNotEmpty())
                 {
                     if (!positionToHitterRankings.containsKey("C"))
                     {
@@ -257,7 +273,7 @@ class FantasyTeamsHandler
 
                     positionToHitterRankings["C"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("2B"))
+                else if (position.equals("2B") && hitterOpposingTeam.isNotEmpty())
                 {
                     if (!positionToHitterRankings.containsKey("2B"))
                     {
@@ -271,7 +287,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["2B"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["2B/SS"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("3B"))
+                else if (position.equals("3B") && hitterOpposingTeam.isNotEmpty())
                 {
                     if (!positionToHitterRankings.containsKey("3B"))
                     {
@@ -285,7 +301,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["3B"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["1B/3B"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("SS"))
+                else if (position.equals("SS") && hitterOpposingTeam.isNotEmpty())
                 {
                     if (!positionToHitterRankings.containsKey("SS"))
                     {
@@ -299,7 +315,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["SS"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["2B/SS"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("LF") || position.equals("RF") || position.equals("CF"))
+                else if ((position.equals("LF") || position.equals("RF") || position.equals("CF")) && hitterOpposingTeam.isNotEmpty())
                 {
                     if (!positionToHitterRankings.containsKey("OF"))
                     {
@@ -309,7 +325,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["OF"]?.add(Pair(hitter, gradeAverage))
                 }
 
-                if (!positionToHitterRankings.containsKey("UTIL"))
+                if (!positionToHitterRankings.containsKey("UTIL") && hitterOpposingTeam.isNotEmpty())
                 {
                     positionToHitterRankings["UTIL"] = PriorityQueue<Pair<LineupOptimizedHitter, Double>>(compareByDescending<Pair<LineupOptimizedHitter, Double>> { it.second })
                 }
@@ -368,7 +384,7 @@ class FantasyTeamsHandler
             }
             if (positionToHitterRankings.containsKey("2B"))
             {
-                while (positionToHitterRankings["2B"]!!.isNotEmpty() && seenPlayers.contains(positionToHitterRankings["1B"]!!.peek().first.playerId))
+                while (positionToHitterRankings["2B"]!!.isNotEmpty() && seenPlayers.contains(positionToHitterRankings["2B"]!!.peek().first.playerId))
                 {
                     positionToHitterRankings["2B"]!!.poll()
                 }
@@ -400,7 +416,7 @@ class FantasyTeamsHandler
             }
             if (positionToHitterRankings.containsKey("SS"))
             {
-                while (positionToHitterRankings["SS"]!!.isNotEmpty() && seenPlayers.contains(positionToHitterRankings["3B"]!!.peek().first.playerId))
+                while (positionToHitterRankings["SS"]!!.isNotEmpty() && seenPlayers.contains(positionToHitterRankings["SS"]!!.peek().first.playerId))
                 {
                     positionToHitterRankings["SS"]!!.poll()
                 }

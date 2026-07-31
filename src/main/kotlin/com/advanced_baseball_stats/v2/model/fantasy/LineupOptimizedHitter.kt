@@ -15,5 +15,9 @@ data class LineupOptimizedHitter(
     val rbis: Int,
     val stolenBases: Int,
     val onBasePercentage: Double,
+    var opposingTeamId: String? = null,
+    var opposingTeamMatchupGrade: Double? = null,
+    var opposingPitcherName: String? = null,
+    var opposingPitcherMatchupGrade: Double? = null
 ){
 }
