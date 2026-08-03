@@ -9,6 +9,7 @@ data class LineupOptimizedHitter(
     val lastName: String,
     val currentTeam: String,
     val currentPosition: String,
+    val currentStatus: String,
     val percentileOverall: Double,
     val runs: Int,
     val homeRuns: Int,

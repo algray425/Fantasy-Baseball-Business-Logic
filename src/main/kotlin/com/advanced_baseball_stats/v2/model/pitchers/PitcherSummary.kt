@@ -15,6 +15,7 @@ class PitcherSummary(
     val height: String,
     val weight: Double,
     val currentTeam: String,
+    val currentStatus: String,
     val percentileEra: Double?,
     val percentileWhip: Double?,
     val percentileKsPerNine: Double?,

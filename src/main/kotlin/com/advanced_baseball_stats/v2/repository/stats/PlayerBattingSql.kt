@@ -295,7 +295,7 @@ object PlayerBattingSql
             .select(
                 BiosTable.playerId, BiosTable.firstName, BiosTable.lastName, BiosTable.dob, BiosTable.batSide, BiosTable.throwHand,
                 BiosTable.height, BiosTable.weight,
-                BiosTable.currentTeam, BiosTable.currentPosition, HitterProjectionsTable.runs, HitterProjectionsTable.homeRuns, HitterProjectionsTable.rbis, HitterProjectionsTable.stolenBases,
+                BiosTable.currentTeam, BiosTable.currentPosition, BiosTable.currentStatus, HitterProjectionsTable.runs, HitterProjectionsTable.homeRuns, HitterProjectionsTable.rbis, HitterProjectionsTable.stolenBases,
                 HitterProjectionsTable.onBasePercentage, HitterProjectionsTable.overallPercentileRuns, HitterProjectionsTable.overallPercentileHomeRuns, HitterProjectionsTable.overallPercentileRbis,
                 HitterProjectionsTable.overallPercentileStolenBases, HitterProjectionsTable.overallPercentileObp, HitterProjectionsTable.overallGradePercentile, HitterProjectionsTable.qualifiedPercentileRuns,
                 HitterProjectionsTable.qualifiedPercentileHomeRuns, HitterProjectionsTable.qualifiedPercentileRbis, HitterProjectionsTable.qualifiedPercentileStolenBases,
@@ -315,6 +315,7 @@ object PlayerBattingSql
                 val weight                          = playerRow[BiosTable.weight] ?: 0.0
                 val currentTeam                     = playerRow[BiosTable.currentTeam] ?: ""
                 val currentPosition                 = playerRow[BiosTable.currentPosition] ?: ""
+                val currentStatus                   = playerRow[BiosTable.currentStatus] ?: ""
                 val runs                            = playerRow[HitterProjectionsTable.runs] ?: 0
                 val homeRuns                        = playerRow[HitterProjectionsTable.homeRuns] ?: 0
                 val rbis                            = playerRow[HitterProjectionsTable.rbis] ?: 0
@@ -338,8 +339,8 @@ object PlayerBattingSql
                 val spdPercentile                   = playerRow[SeasonGradesTable.spdPercentile] ?: 0.0
                 val laSweetSpotPercentile           = playerRow[SeasonGradesTable.laSweetSpotPercentile] ?: 0.0
 
-                batterSummary = BatterSummary(playerId, firstName, lastName, AgeHelper.calculateAgeFromTimestamp(dob), batSide, throwHand, height, weight, currentTeam, currentPosition, runs, homeRuns,
-                    rbis, stolenBases, onBasePercentage, overallPercentileRuns, overallPercentileHomeRuns, overallPercentileRbis, overallPercentileStolenBases,
+                batterSummary = BatterSummary(playerId, firstName, lastName, AgeHelper.calculateAgeFromTimestamp(dob), batSide, throwHand, height, weight, currentTeam, currentPosition, currentStatus,
+                    runs, homeRuns, rbis, stolenBases, onBasePercentage, overallPercentileRuns, overallPercentileHomeRuns, overallPercentileRbis, overallPercentileStolenBases,
                     overallPercentileObp, overallGradePercentile, qualifiedPercentileRuns, qualifiedPercentileHomeRuns, qualifiedPercentileRbis, qualifiedPercentileStolenBases,
                     qualifiedPercentileObp, qualifiedGradePercentile, hardHitPercentile, barrelPercentile, babipPercentile, spdPercentile, laSweetSpotPercentile)
             }
@@ -596,7 +597,7 @@ object PlayerBattingSql
             .leftJoin(BiosTable, on = (BiosTable.playerId eq PerGameStatsHittingTable.playerId))
             .leftJoin(SeasonGradesTable, on = (SeasonGradesTable.playerId eq PerGameStatsHittingTable.playerId) and (SeasonGradesTable.season eq season))
             .innerJoin(GamesTable, on = GamesTable.gameId eq PerGameStatsHittingTable.gameId)
-            .select(BiosTable.playerId, BiosTable.firstName, BiosTable.lastName,BiosTable.currentTeam,BiosTable.currentPosition,
+            .select(BiosTable.playerId, BiosTable.firstName, BiosTable.lastName, BiosTable.currentTeam, BiosTable.currentPosition, BiosTable.currentStatus,
                 SeasonGradesTable.percentileOverall, sum(PerGameStatsHittingTable.runs).aliased("runs"), sum(PerGameStatsHittingTable.homeRuns).aliased("homeRuns"),
                 sum(PerGameStatsHittingTable.rbis).aliased("rbis"), sum(PerGameStatsHittingTable.stolenBases).aliased("stolenBases"),
                 sum(PerGameStatsHittingTable.hits).aliased("hits"), sum(PerGameStatsHittingTable.walks).aliased("walks"),
@@ -610,6 +611,7 @@ object PlayerBattingSql
                 val lastName            = playerRow[BiosTable.lastName                  ] ?: ""
                 val currentTeam         = playerRow[BiosTable.currentTeam               ] ?: ""
                 val currentPosition     = playerRow[BiosTable.currentPosition           ] ?: ""
+                val currentStatus       = playerRow[BiosTable.currentStatus             ] ?: ""
                 val percentileOverall   = playerRow[SeasonGradesTable.percentileOverall ] ?: 0.0
                 val runs                = playerRow[sum(PerGameStatsHittingTable.runs       ).aliased("runs")] ?: 0
                 val homeRuns            = playerRow[sum(PerGameStatsHittingTable.homeRuns   ).aliased("homeRuns")] ?: 0
@@ -630,7 +632,7 @@ object PlayerBattingSql
                     obp = (hits + walks + hitByPitch).toDouble() / obpDenom
                 }
 
-                lineupOptimizedHitters.add(LineupOptimizedHitter(playerId, firstName, lastName, currentTeam, currentPosition,
+                lineupOptimizedHitters.add(LineupOptimizedHitter(playerId, firstName, lastName, currentTeam, currentPosition, currentStatus,
                     percentileOverall, runs, homeRuns, rbis, stolenBases, obp))
             }
 

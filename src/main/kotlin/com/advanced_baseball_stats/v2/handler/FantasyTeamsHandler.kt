@@ -239,7 +239,8 @@ class FantasyTeamsHandler
 
                 val gradeAverage = (hitterPercentileTeam + hitterPercentileOverall + matchupGradeOverall + matchupGradePitcher.second) / 4.0
 
-                val position = hitter.currentPosition
+                val position    = hitter.currentPosition
+                val status      = hitter.currentStatus
 
                 if (hitterOpposingTeam.isNotEmpty())
                 {
@@ -250,7 +251,7 @@ class FantasyTeamsHandler
                 hitter.opposingPitcherName          = matchupGradePitcher.first
                 hitter.opposingPitcherMatchupGrade  = matchupGradePitcher.second
 
-                if (position.equals("1B") && hitterOpposingTeam.isNotEmpty())
+                if (position.equals("1B") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     if (!positionToHitterRankings.containsKey("1B"))
                     {
@@ -264,7 +265,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["1B"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["1B/3B"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("C") && hitterOpposingTeam.isNotEmpty())
+                else if (position.equals("C") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     if (!positionToHitterRankings.containsKey("C"))
                     {
@@ -273,7 +274,7 @@ class FantasyTeamsHandler
 
                     positionToHitterRankings["C"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("2B") && hitterOpposingTeam.isNotEmpty())
+                else if (position.equals("2B") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     if (!positionToHitterRankings.containsKey("2B"))
                     {
@@ -287,7 +288,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["2B"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["2B/SS"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("3B") && hitterOpposingTeam.isNotEmpty())
+                else if (position.equals("3B") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     if (!positionToHitterRankings.containsKey("3B"))
                     {
@@ -301,7 +302,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["3B"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["1B/3B"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if (position.equals("SS") && hitterOpposingTeam.isNotEmpty())
+                else if (position.equals("SS") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     if (!positionToHitterRankings.containsKey("SS"))
                     {
@@ -315,7 +316,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["SS"   ]?.add(Pair(hitter, gradeAverage))
                     positionToHitterRankings["2B/SS"]?.add(Pair(hitter, gradeAverage))
                 }
-                else if ((position.equals("LF") || position.equals("RF") || position.equals("CF")) && hitterOpposingTeam.isNotEmpty())
+                else if ((position.equals("LF") || position.equals("RF") || position.equals("CF")) && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     if (!positionToHitterRankings.containsKey("OF"))
                     {
@@ -325,7 +326,7 @@ class FantasyTeamsHandler
                     positionToHitterRankings["OF"]?.add(Pair(hitter, gradeAverage))
                 }
 
-                if (!positionToHitterRankings.containsKey("UTIL") && hitterOpposingTeam.isNotEmpty())
+                if (!positionToHitterRankings.containsKey("UTIL") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
                 {
                     positionToHitterRankings["UTIL"] = PriorityQueue<Pair<LineupOptimizedHitter, Double>>(compareByDescending<Pair<LineupOptimizedHitter, Double>> { it.second })
                 }

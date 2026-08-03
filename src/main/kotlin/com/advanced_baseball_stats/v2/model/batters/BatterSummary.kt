@@ -16,6 +16,7 @@ class BatterSummary(
     val weight: Double,
     val currentTeam: String,
     val currentPosition: String,
+    val currentStatus: String,
     val predictedRuns: Int,
     val predictedHomeRuns: Int,
     val predictedRbis: Int,

@@ -71,8 +71,8 @@ object PlayerPitchingSql
         DatabaseConnection.database.from(BiosTable)
             .leftJoin(SeasonGradesStartingPitchersTable, on = (SeasonGradesStartingPitchersTable.playerId eq BiosTable.playerId) and (SeasonGradesStartingPitchersTable.season eq 2026))
             .leftJoin(SeasonGradesReliefPitchersTable, on = (SeasonGradesReliefPitchersTable.playerId eq BiosTable.playerId) and (SeasonGradesReliefPitchersTable.season eq 2026))
-            .select(BiosTable.firstName, BiosTable.lastName, BiosTable.dob, BiosTable.batSide, BiosTable.throwHand,
-                BiosTable.height, BiosTable.weight, BiosTable.currentTeam, SeasonGradesStartingPitchersTable.percentileEra, SeasonGradesStartingPitchersTable.percentileWhip,
+            .select(BiosTable.firstName, BiosTable.lastName, BiosTable.dob, BiosTable.batSide, BiosTable.throwHand, BiosTable.height, BiosTable.weight, BiosTable.currentTeam, BiosTable.currentStatus,
+                SeasonGradesStartingPitchersTable.percentileEra, SeasonGradesStartingPitchersTable.percentileWhip,
                 SeasonGradesStartingPitchersTable.percentileKsPerNine, SeasonGradesStartingPitchersTable.percentileQualityStarts,
                 SeasonGradesStartingPitchersTable.percentileFip, SeasonGradesStartingPitchersTable.percentileStrikeOutWalkDifference,
                 SeasonGradesStartingPitchersTable.percentileCsw, SeasonGradesStartingPitchersTable.percentileOverall,
@@ -90,6 +90,7 @@ object PlayerPitchingSql
                 val height                          = playerRow[BiosTable.height] ?: ""
                 val weight                          = playerRow[BiosTable.weight] ?: 0.0
                 val currentTeam                     = playerRow[BiosTable.currentTeam] ?: ""
+                val currentStatus                   = playerRow[BiosTable.currentStatus] ?: ""
 
                 var percentileEra                       : Double? = null
                 var percentileWhip                      : Double? = null
@@ -125,7 +126,7 @@ object PlayerPitchingSql
                 }
 
                 pitcherSummary = PitcherSummary(playerId, firstName, lastName, AgeHelper.calculateAgeFromTimestamp(dob),
-                    batSide, throwHand, height, weight, currentTeam, percentileEra, percentileWhip, percentileKsPerNine,
+                    batSide, throwHand, height, weight, currentTeam, currentStatus, percentileEra, percentileWhip, percentileKsPerNine,
                     percentileQualityStarts, percentileSavesAndHolds, percentileFip, percentileStrikeOutWalkDifference,
                     percentileCsw, percentileOverall)
             }
