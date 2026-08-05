@@ -326,12 +326,15 @@ class FantasyTeamsHandler
                     positionToHitterRankings["OF"]?.add(Pair(hitter, gradeAverage))
                 }
 
-                if (!positionToHitterRankings.containsKey("UTIL") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
+                if (!positionToHitterRankings.containsKey("UTIL"))
                 {
                     positionToHitterRankings["UTIL"] = PriorityQueue<Pair<LineupOptimizedHitter, Double>>(compareByDescending<Pair<LineupOptimizedHitter, Double>> { it.second })
                 }
 
-                positionToHitterRankings["UTIL" ]?.add(Pair(hitter, gradeAverage))
+                if (positionToHitterRankings.containsKey("UTIL") && hitterOpposingTeam.isNotEmpty() && status.equals("A"))
+                {
+                    positionToHitterRankings["UTIL"]?.add(Pair(hitter, gradeAverage))
+                }
             }
 
             //take top n players from each position to determine optimal lineup
@@ -484,7 +487,7 @@ class FantasyTeamsHandler
             }
             if (positionToHitterRankings.containsKey("UTIL"))
             {
-                while (positionToHitterRankings["UTIL"]!!.isNotEmpty() && optimizedLineup["UTIL"]!!.size < 2)
+                while (positionToHitterRankings["UTIL"]!!.isNotEmpty())
                 {
                     while (positionToHitterRankings["UTIL"]!!.isNotEmpty() && seenPlayers.contains(positionToHitterRankings["UTIL"]!!.peek().first.playerId))
                     {
@@ -497,7 +500,7 @@ class FantasyTeamsHandler
 
                         seenPlayers.add(bestOfTheRest.first.playerId)
 
-                        optimizedLineup["UTIL"]!!.add(bestOfTheRest.first)
+                        if (optimizedLineup["UTIL"]!!.size < 2) optimizedLineup["UTIL"]!!.add(bestOfTheRest.first) else optimizedLineup["BENCH"]!!.add(bestOfTheRest.first)
                     }
                 }
             }
